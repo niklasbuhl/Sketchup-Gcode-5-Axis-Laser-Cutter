@@ -35,7 +35,7 @@ module Main
 
     analyse_planes
 
-  en
+  end
 
   def self.cutting_strategy
 

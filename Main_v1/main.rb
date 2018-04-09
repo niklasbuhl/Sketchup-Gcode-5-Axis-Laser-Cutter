@@ -2,6 +2,9 @@ require 'sketchup.rb'
 
 # Project by Jesper Kirial and Niklas Buhl
 
+# Learning
+require_relative 'first.rb'
+
 # Import GCode Functions
 require_relative 'importgcode.rb'
 
@@ -17,9 +20,7 @@ require_relative 'trajectoryplanning.rb'
 # Export GCode Functions
 require_relative 'exportgcode.rb'
 
-# Learning
-require_relative 'first.rb'
-
+#GCode Class (Struct, "Draw")
 require_relative 'gcodeclass.rb'
 
 module Main

@@ -1,8 +1,8 @@
 require 'sketchup.rb'
 
-module Trajectory_Planning
+module TrajectoryPlanning
 
-  def generate_travel_points
+  def self.generate_travel_points
 
     puts "Generating travel points..."
 
@@ -10,7 +10,7 @@ module Trajectory_Planning
 
   end
 
-  def optimize_trajectory
+  def self.optimize_trajectory
 
     puts "Optimizing travel trajectory..."
 
@@ -18,7 +18,7 @@ module Trajectory_Planning
 
   end
 
-  def complete_trajectory
+  def self.complete_trajectory
 
     puts "Generating complete trajectory..."
 

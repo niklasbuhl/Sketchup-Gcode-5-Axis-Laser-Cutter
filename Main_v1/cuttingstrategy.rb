@@ -1,8 +1,8 @@
 require 'sketchup.rb'
 
-module Cutting_Strategy
+module CuttingStrategy
 
-  def select_strategy
+  def self.select_strategy
 
     puts "Select cutting strategy; A, B or C?"
 
@@ -10,7 +10,7 @@ module Cutting_Strategy
 
   end
 
-  def cutting_path_strategy_a
+  def self.cutting_path_strategy_a
 
     puts "Generating cutting path from plane <...>."
 
@@ -18,7 +18,7 @@ module Cutting_Strategy
 
   end
 
-  def cutting_path_strategy_b
+  def self.cutting_path_strategy_b
 
     puts "Generating cutting path from plane <...>."
 
@@ -26,7 +26,7 @@ module Cutting_Strategy
 
   end
 
-  def cutting_path_strategy_c
+  def self.cutting_path_strategy_c
 
     puts "Generating cutting path from plane <...>."
 

@@ -3,23 +3,32 @@ require 'sketchup.rb'
 # Project by Jesper Kirial and Niklas Buhl
 
 # Analyse Model
-require_relative 'analyse_model.rb'
+require_relative 'analysemodel.rb'
 
 # Cutting Strategy
-require_relative 'cutting_strategy.rb'
+require_relative 'cuttingstrategy.rb'
 
 # Trajectory Planning
-require_relative 'trajectory_planning.rb'
+require_relative 'trajectoryplanning.rb'
 
 # Export GCode
-require_relative 'export_gcode.rb'
+require_relative 'exportgcode.rb'
+
+# Test systems
+require_relative 'first.rb'
 
 module Main
 
-  include Analyse_Model
-  include Cutting_Strategy
-  include Trajectory_Planning
-  include Export_GCode
+  puts "Loading all systems..."
+
+  include First
+  include AnalyseModel
+  include CuttingStrategy
+  include TrajectoryPlanning
+  include ExportGCode
+  include First
+
+  puts "All systems go! All updated."
 
   def self.hello_world
 
@@ -27,45 +36,57 @@ module Main
 
   end
 
+  # def self.hello_first
+  #
+  #   First.first_method
+  #
+  # end
+
+  def self.example_model
+
+    # Create a really nice example model!
+
+  end
+
   def self.analyse_model
 
-    find_vertices
+    AnalyseModel.find_vertices
 
-    find_planes
+    AnalyseModel.find_planes
 
-    analyse_planes
+    AnalyseModel.analyse_planes
 
   end
 
   def self.cutting_strategy
 
-    select_strategy
+    CuttingStrategy.select_strategy
 
-    cutting_path_strategy_a
+    CuttingStrategy.cutting_path_strategy_a
 
-    cutting_path_strategy_b
+    CuttingStrategy.cutting_path_strategy_b
 
-    cutting_path_strategy_c
+    CuttingStrategy.cutting_path_strategy_c
 
   end
 
   def self.trajectory_planning
 
-    generate_travel_points
+    TrajectoryPlanning.generate_travel_points
 
-    optimize_trajectory
+    TrajectoryPlanning.optimize_trajectory
 
-    complete_trajectory
+    TrajectoryPlanning.complete_trajectory
 
   end
 
   def self.export_gcode
 
-    generate_gcode
+    ExportGCode.generate_gcode
 
-    create_new_file
+    ExportGCode.create_new_file
 
-    write_gcode_to_file
+    ExportGCode.write_gcode_to_file
 
   end
 
@@ -74,10 +95,16 @@ module Main
     menu = UI.menu('Plugins')
 
     menu.add_item('Hello World') {self.hello_world}
+
+    # menu.add_item('Hello First World') {self.hello_first}
+    menu.add_item('Example Model') {self.example}
+
     menu.add_item('Analyse Model') {self.analyse_model}
     menu.add_item('Generate Cutting Paths') {self.cutting_strategy}
     menu.add_item('Trajectory Planning') {self.trajectory_planning}
     menu.add_item('Export GCode') {self.export_gcode}
+
+    menu.add_item('Remove Extension') {self.analyse_model}
 
     file_loaded(__FILE__)
 

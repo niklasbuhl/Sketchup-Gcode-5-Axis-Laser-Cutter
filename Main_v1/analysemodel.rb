@@ -1,8 +1,8 @@
 require 'sketchup.rb'
 
-module Analyse_Model
+module AnalyseModel
 
-  def find_vertices
+  def self.find_vertices
 
     puts "Finding Vertices..."
 
@@ -12,7 +12,7 @@ module Analyse_Model
 
   end
 
-  def find_planes
+  def self.find_planes
 
     puts "Finding Planes..."
 
@@ -22,7 +22,7 @@ module Analyse_Model
 
   end
 
-  def analyse_planes
+  def self.analyse_planes
 
     puts "Analyzing all planes..."
 

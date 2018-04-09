@@ -1,8 +1,10 @@
 require 'sketchup.rb'
 
-module Export_GCode
+module ExportGCode
 
-  def create_new_file
+  puts "Testing GCode Export Systems..."
+
+  def self.create_new_file
 
     puts "Creating new file..."
 
@@ -12,7 +14,7 @@ module Export_GCode
 
   end
 
-  def generate_gcode
+  def self.generate_gcode
 
     puts "Generating GCode from trajectory..."
 
@@ -22,7 +24,7 @@ module Export_GCode
 
   end
 
-  def write_gcode_to_file
+  def self.write_gcode_to_file
 
     puts "Write to file..."
 
@@ -31,5 +33,7 @@ module Export_GCode
     puts "Happy cutting!"
 
   end
+
+  puts "All systems a okay..."
 
 end

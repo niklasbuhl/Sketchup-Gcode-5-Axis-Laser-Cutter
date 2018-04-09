@@ -46,6 +46,8 @@ module Main
 
     # Create a really nice example model!
 
+    puts "Creating random examples model..."
+
   end
 
   def self.analyse_model
@@ -95,11 +97,10 @@ module Main
     menu = UI.menu('Plugins')
 
     menu.add_item('Hello World') {self.hello_world}
-
+    # Learning about functions in other files
     # menu.add_item('Hello First World') {self.hello_first}
-    menu.add_item('Example Model') {self.example}
-
-    menu.add_item('Analyse Model') {self.analyse_model}
+    menu.add_item('Example Model') {self.example_model}
+    menu.add_item('Analyse Model') {self.analyse}
     menu.add_item('Generate Cutting Paths') {self.cutting_strategy}
     menu.add_item('Trajectory Planning') {self.trajectory_planning}
     menu.add_item('Export GCode') {self.export_gcode}

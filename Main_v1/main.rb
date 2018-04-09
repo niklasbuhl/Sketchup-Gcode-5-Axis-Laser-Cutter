@@ -2,33 +2,45 @@ require 'sketchup.rb'
 
 # Project by Jesper Kirial and Niklas Buhl
 
-# Analyse Model
+# Import GCode Functions
+require_relative 'importgcode.rb'
+
+# Analyse Model Functions
 require_relative 'analysemodel.rb'
 
-# Cutting Strategy
+# Cutting Strategy Functions
 require_relative 'cuttingstrategy.rb'
 
-# Trajectory Planning
+# Trajectory Planning Functions
 require_relative 'trajectoryplanning.rb'
 
-# Export GCode
+# Export GCode Functions
 require_relative 'exportgcode.rb'
 
-# Test systems
+# Learning
 require_relative 'first.rb'
+
+require_relative 'gcodeclass.rb'
 
 module Main
 
   puts "Loading all systems..."
 
-  include First
+  #include First
+  include ImportGCode
   include AnalyseModel
   include CuttingStrategy
   include TrajectoryPlanning
   include ExportGCode
   include First
 
-  puts "All systems go! All updated."
+  puts "All systems go! Stupid loading..."
+
+  # Creating the empty array
+  puts "Creating empty GCode array."
+
+  #gcodearray = Array.new
+  $gcodearray = [1,2,3]
 
   def self.hello_world
 
@@ -47,6 +59,20 @@ module Main
     # Create a really nice example model!
 
     puts "Creating random examples model..."
+
+  end
+
+  # def self.test_array_function array
+  #
+  #   puts array
+  #
+  # end
+
+  def self.import_gcode
+
+    #test_array_function($gcodearray)
+
+    ImportGCode.import_gcode($gcodearray)
 
   end
 
@@ -92,6 +118,16 @@ module Main
 
   end
 
+  def self.update_extension
+
+    load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v1/importgcode.rb")
+    load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v1/cuttingstrategy.rb")
+    load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v1/analysemodel.rb")
+    load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v1/exportgcode.rb")
+    load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v1/trajectoryplanning.rb")
+
+  end
+
   unless file_loaded?(__FILE__)
 
     menu = UI.menu('Plugins')
@@ -99,13 +135,16 @@ module Main
     menu.add_item('Hello World') {self.hello_world}
     # Learning about functions in other files
     # menu.add_item('Hello First World') {self.hello_first}
+
+    menu.add_item('Import GCode') {self.import_gcode}
     menu.add_item('Example Model') {self.example_model}
     menu.add_item('Analyse Model') {self.analyse}
     menu.add_item('Generate Cutting Paths') {self.cutting_strategy}
     menu.add_item('Trajectory Planning') {self.trajectory_planning}
     menu.add_item('Export GCode') {self.export_gcode}
 
-    menu.add_item('Remove Extension') {self.analyse_model}
+    # To remove extension (Used for development purposes)
+    menu.add_item('Update Extension') {self.update_extension}
 
     file_loaded(__FILE__)
 

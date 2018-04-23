@@ -56,10 +56,27 @@ FaceCheck Sketchup.active_model.entities, faceCount, faceArray
 #puts "Loop Complete! Face Count: #{faceCount}"
 #puts "#{faceArray}"
 
+def orderedFaceVertices face
+
+  faceVertices = face.vertices
+
+  faceVertices.each do |vertex|
+
+    vertexPosition = vertex.position
+
+    puts vertexPosition.inspect
+
+  end
+
+end
+
 faceArray.each do |face|
 
   # puts face
 
   face.material = "red"
+  face.back_material = "red"
+
+  faceVertices face
 
 end

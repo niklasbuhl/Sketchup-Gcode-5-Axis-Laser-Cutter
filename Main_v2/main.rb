@@ -45,11 +45,12 @@ module Main
 
   $gcodearray = Array.new
 
-  #global positioning of the
+  # Global origin position
+  $origin = Geom::Point3d.new(0,0,0);
 
-  $position = Position.new(Vector[0,1,2])
+  # Position used for drawing GCode instructions
+  $position = Geom::Point3d.new(0,0,0);
 
-  #$direction = Vector[0,-1,0] # Simply vector to show which direction the laser is pointing, not to be confused with orientation which would also take a fourth variable
 
   def self.hello_world
 

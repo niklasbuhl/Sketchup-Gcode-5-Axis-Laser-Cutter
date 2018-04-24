@@ -2,6 +2,8 @@
 
 # By Jesper Kirial and Niklas Buhl
 
+
+
 faceCount = 0
 
 faceArray = Array.new
@@ -14,8 +16,6 @@ faceArray = Array.new
 =end
 
 def FaceCheck entity, count, array
-
-  puts "Looping through entity v1.3"
 
   # Loop through all the entities.
 
@@ -51,32 +51,76 @@ def FaceCheck entity, count, array
 
 end
 
-FaceCheck Sketchup.active_model.entities, faceCount, faceArray
+def TooManyVertices face
 
-#puts "Loop Complete! Face Count: #{faceCount}"
-#puts "#{faceArray}"
+  vertexCount = face.vertices.length
 
-def orderedFaceVertices face
+  if vertexCount > 4
 
-  faceVertices = face.vertices
+    face.material = "yellow"
+    face.back_material = "yellow"
 
-  faceVertices.each do |vertex|
+    return true
 
-    vertexPosition = vertex.position
+  end
 
-    puts vertexPosition.inspect
+  return false
+
+end
+
+def TopBottom face
+
+  angle = face.normal.angle_between Geom::Vector3d.new(0,0,1)
+
+  angle = angle * 180 / Math::PI
+
+  angle = angle.round
+
+  #puts "Angle: #{angle}"
+
+  if angle == 0 || angle == 180
+
+    face.material = "blue"
+    face.back_material = "blue"
 
   end
 
 end
 
-faceArray.each do |face|
+def AnalyseFaces array
 
-  # puts face
+  array.each do |face|
 
-  face.material = "red"
-  face.back_material = "red"
+    # Check for top and bottom
+    next if TopBottom face
 
-  faceVertices face
+    # Check for faces with too many vertices
+    next if TooManyVertices face
+
+  end
 
 end
+
+def GreenFace array
+
+  array.each do |face|
+
+    face.material = "green"
+    face.back_material = "green"
+
+  end
+
+end
+
+
+# Analyse current model for faces
+FaceCheck Sketchup.active_model.entities, faceCount, faceArray
+
+# Color all found faces green
+GreenFace faceArray
+
+# Analyse found faces
+AnalyseFaces faceArray
+
+#puts "Loop Complete! Face Count: #{faceCount}"
+#puts "#{faceArray}"

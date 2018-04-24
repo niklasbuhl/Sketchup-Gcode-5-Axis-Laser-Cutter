@@ -1,0 +1,13 @@
+def orderedFaceVertices face
+
+  faceVertices = face.vertices
+
+  faceVertices.each do |vertex|
+
+    vertexPosition = vertex.position
+
+    puts vertexPosition.inspect
+
+  end
+
+end

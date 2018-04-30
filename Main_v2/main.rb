@@ -1,11 +1,21 @@
 # Project by Jesper Kirial and Niklas Buhl
 
-require 'sketchup.rb'
+# Too add to Sketchup on Niklas
 
-require_relative 'modelfaces.rb'
-require_relative 'analysefaces.rb'
+  # UI.menu.add_item("Reload My File") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v2/main.rb");}
+
+
+require 'sketchup'
+# require 'os' # https://rubygems.org/gems/os
+
+require_relative 'modelfaces'
+require_relative 'analysefaces'
 
 module Main
+
+  # Hello World
+
+  puts "Hello World. v0.3 - UpdateExtension working on mac"
 
   # Includes
 
@@ -14,7 +24,7 @@ module Main
 
   # Variables
 
-  faceArray = Array.new # Keep track of found faces
+  $faceArray = Array.new # Keep track of found faces
 
   # ---
 
@@ -32,17 +42,17 @@ module Main
 
     # Analyse model for faces
 
-    ModelFaces.FaceCheck Sketchup.active_model.entities, foundFacesCount, faceArray
+    ModelFaces.FaceCheck Sketchup.active_model.entities, foundFacesCount, $faceArray
 
     # Color found faces green
 
-    ModelFaces.FoundFaces faceArray
+    ModelFaces.FoundFaces $faceArray
 
     puts "Faces found!"
 
     puts "Analysing found faces..."
 
-    faceArray.each do |face|
+    $faceArray.each do |face|
 
       # Check for top and bottom
       next if AnalyseFaces.TopBottom face
@@ -108,10 +118,23 @@ module Main
 
   def self.UpdateExtension
 
-    puts "Updating modules."
+    puts "Updating modules. v0.5 - OS Detection"
 
-    load("../modelfaces.rb")
-    load("../analysefaces.rb")
+    projectdir = File.dirname(__FILE__)
+
+    load projectdir + "/modelfaces.rb"
+    load projectdir + "/analysefaces.rb"
+
+    # puts projectdir
+
+=begin
+
+    if OS.osx?
+      load projectdir + "/modelfaces.rb"
+      load projectdir + "/analysefaces.rb"
+    end
+
+=end
 
   end
 

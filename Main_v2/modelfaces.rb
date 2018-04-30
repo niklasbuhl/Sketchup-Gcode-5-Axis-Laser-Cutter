@@ -11,7 +11,7 @@
 
 module ModelFaces
 
-  def FindFaces entity, count, array
+  def self.FaceCheck entity, count, array
 
     # Loop through all the entities.
 
@@ -47,7 +47,7 @@ module ModelFaces
 
   end
 
-  def FoundFaces array
+  def self.FoundFaces array
 
     array.each do |face|
 

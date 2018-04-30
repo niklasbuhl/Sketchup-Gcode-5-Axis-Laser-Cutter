@@ -4,7 +4,7 @@ module AnalyseFaces
 
   # Check if the faces is top or bottom
 
-  def TopBottom face
+  def self.TopBottom face
 
     angle = face.normal.angle_between Geom::Vector3d.new(0,0,1)
 
@@ -25,7 +25,7 @@ module AnalyseFaces
 
   # Check if the face has too many vertices
 
-  def TooManyVertices face
+  def self.TooManyVertices face
 
     vertexCount = face.vertices.length
 

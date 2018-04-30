@@ -27,6 +27,8 @@ module Main
 
   $faceArray = Array.new # Keep track of found faces
 
+  $backupModel
+
   # ---
 
   # Primary Methods
@@ -116,6 +118,14 @@ module Main
   # ---
 
   def self.GenerateTestModels
+
+    puts "Generate Test Models. v0.2"
+
+    model = Sketchup.active_model
+
+    testModelPath = File.join(File.dirname(__FILE__),'/test-geometrier-laser.skp')
+
+    model.import(testModelPath)
 
   end
 

@@ -6,10 +6,11 @@
 
 
 require 'sketchup'
-# require 'os' # https://rubygems.org/gems/os
+# require 'os' # https://rubygems.org/gems/os // How to add it into the Skethcup path
 
 require_relative 'modelfaces'
 require_relative 'analysefaces'
+require_relative 'analysecuttingfaces'
 
 module Main
 
@@ -62,7 +63,8 @@ module Main
 
       # Check if faces is too angled
 
-      #
+      # Rest of faces is cutting faces
+      #function to color remaining red and put them into cutting faces array
 
     end
 

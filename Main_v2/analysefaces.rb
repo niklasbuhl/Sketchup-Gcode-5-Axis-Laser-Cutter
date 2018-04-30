@@ -19,7 +19,11 @@ module AnalyseFaces
       face.material = "blue"
       face.back_material = "blue"
 
+      return true
+
     end
+
+    return false
 
   end
 
@@ -49,10 +53,11 @@ module AnalyseFaces
 
           if face.normal.z > - 0.70710678118654 && face.normal.z < 0.70710678118654
 
-            face =  face.material = "cyan"
-            face = face.back_material ="cyan"
+            face.material = "red"
+            face.back_material = "red"
 
             return true
+
           end
 
           return false

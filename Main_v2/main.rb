@@ -28,8 +28,6 @@ module Main
 
     puts "Finding faces..."
 
-    foundFaces = 0
-
     # Analyse model for faces
 
     ModelFaces.FaceCheck Sketchup.active_model.entities, faceArray, foundFaces

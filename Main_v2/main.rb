@@ -119,25 +119,31 @@ module Main
 
   end
 
-  def self.UpdateExtension
+  def self.UpdateExtensionOSX
 
-    puts "Updating modules. v0.5 - OS Detection"
+    puts "Updating modules. v0.6 - OSX"
 
     projectdir = File.dirname(__FILE__)
 
     load projectdir + "/modelfaces.rb"
     load projectdir + "/analysefaces.rb"
+    load projectdir + "/analysecuttingfaces.rb"
 
     # puts projectdir
 
-=begin
+  end
 
-    if OS.osx?
-      load projectdir + "/modelfaces.rb"
-      load projectdir + "/analysefaces.rb"
-    end
+  def self.UpdateExtensionWIN
 
-=end
+    puts "Updating modules. v0.1 - WIN"
+
+    projectdir = File.dirname(__FILE__)
+
+    load projectdir + "\modelfaces.rb"
+    load projectdir + "\analysefaces.rb"
+    load projectdir + "\analysecuttingfaces.rb"
+
+    # puts projectdir
 
   end
 
@@ -161,7 +167,8 @@ module Main
     menu.add_item('Generate Test Models') {self.GenerateTestModels}
 
     # To remove extension (Used for development purposes)
-    menu.add_item('Update Extension') {self.UpdateExtension}
+    menu.add_item('Update Extension OSX') {self.UpdateExtensionOSX}
+    menu.add_item('Update Extension WIN') {self.UpdateExtensionWIN}
 
     file_loaded(__FILE__)
 

@@ -42,4 +42,20 @@ module AnalyseFaces
 
   end
 
-end
+
+# Make sure the angles of the faces do not exceed 45 degreess
+
+    def self.TooAngled face
+
+          if face.normal.z>-0,70710678118654 && face.normal.z<0.70710678118654
+
+            face =  face.material = "cyan"
+            face = face.back_material ="cyan"
+
+            return true
+          end
+
+          return false
+    end
+
+  end

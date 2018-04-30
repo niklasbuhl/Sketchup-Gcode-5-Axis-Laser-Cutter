@@ -61,6 +61,7 @@ module Main
       next if AnalyseFaces.TooManyVertices face
 
       # Check if faces is too angled
+      next if AnalyseFaces.TooAngled face
 
       #
 

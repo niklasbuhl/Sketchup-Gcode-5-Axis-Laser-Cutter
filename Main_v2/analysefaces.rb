@@ -47,7 +47,11 @@ module AnalyseFaces
 
     def self.TooAngled face
 
+<<<<<<< HEAD
           if face.normal.z > - 0.70710678118654 && face.normal.z < 0.70710678118654
+=======
+          if face.normal.z>-0.70710678118654 && face.normal.z<0.70710678118654
+>>>>>>> e9e1d2e36ce351e356a17238b24a4bad07297bf6
 
             face =  face.material = "cyan"
             face = face.back_material ="cyan"

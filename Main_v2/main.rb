@@ -2,7 +2,19 @@
 
 require 'sketchup.rb'
 
+require_relative 'modelfaces.rb'
+require_relative 'analysefaces.rb'
+
 module Main
+
+  # Includes
+
+  include ModelFaces
+  include AnalyseFaces
+
+  # Variables
+
+  faceArray = Array.new # Keep track of found faces
 
   # ---
 
@@ -14,6 +26,34 @@ module Main
 
     puts "Analysing model..."
 
+    puts "Finding faces..."
+
+    foundFaces = 0
+
+    # Analyse model for faces
+
+    ModelFaces.FaceCheck Sketchup.active_model.entities, faceArray, foundFaces
+
+    # Color found faces green
+
+    ModelFaces.FoundFaces faceArray
+
+    puts "Faces found!"
+
+    puts "Analysing found faces..."
+
+    faceArray.each do |face|
+
+      # Check for top and bottom
+      next if AnalyseFaces.TopBottom face
+
+      # Check for faces with too many vertices
+      next if AnalyseFaces.TooManyVertices face
+
+    end
+
+    puts "Analysed found faces!"
+
     puts "Model Analysed!"
 
   end
@@ -23,8 +63,6 @@ module Main
     puts "Analysing cutting faces..."
 
     # Analyse each face
-
-    
 
     puts "Cutting faces analysed!"
 
@@ -75,6 +113,8 @@ module Main
   # ---
 
   # Create new toolbar with buttons.
+
+=begin
   toolbar = UI::Toolbar.new "5 Axis Lasercutter"
 
   cmd = UI::Command.new("Analyse Model") { AnalyseModel }
@@ -109,5 +149,6 @@ module Main
   toolbar.each { | item |
     puts item
   }
+=end
 
 end

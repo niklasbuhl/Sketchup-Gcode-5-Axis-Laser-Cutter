@@ -22,15 +22,17 @@ module Main
 
   # ---
 
-  def AnalyseModel
+  def self.AnalyseModel
 
     puts "Analysing model..."
 
     puts "Finding faces..."
 
+    foundFacesCount = 0
+
     # Analyse model for faces
 
-    ModelFaces.FaceCheck Sketchup.active_model.entities, faceArray, foundFaces
+    ModelFaces.FaceCheck Sketchup.active_model.entities, foundFacesCount, faceArray
 
     # Color found faces green
 
@@ -48,6 +50,10 @@ module Main
       # Check for faces with too many vertices
       next if AnalyseFaces.TooManyVertices face
 
+      # Check if faces is too angled
+
+      #
+
     end
 
     puts "Analysed found faces!"
@@ -56,7 +62,7 @@ module Main
 
   end
 
-  def AnalyseCuttingFaces
+  def self.AnalyseCuttingFaces
 
     puts "Analysing cutting faces..."
 
@@ -66,7 +72,7 @@ module Main
 
   end
 
-  def CalculateCuttingStrategy
+  def self.CalculateCuttingStrategy
 
     puts "Calculating cutting strategy..."
 
@@ -78,13 +84,13 @@ module Main
 
   end
 
-  def GenerateGCode
+  def self.GenerateGCode
 
     puts "Generating GCode..."
 
   end
 
-  def ExportGCode
+  def self.ExportGCode
 
     puts "Export GCode..."
 
@@ -96,11 +102,42 @@ module Main
 
   # ---
 
-  def GenerateTestModels
+  def self.GenerateTestModels
 
   end
 
-  def UpdateExtension
+  def self.UpdateExtension
+
+    puts "Updating modules."
+
+    load("../modelfaces.rb")
+    load("../analysefaces.rb")
+
+  end
+
+  # ---
+
+  # User Interface Dropdown Menu
+
+  # ---
+
+  unless file_loaded?(__FILE__)
+
+    menu = UI.menu('Plugins')
+
+    menu.add_item('Analyse Model') {self.AnalyseModel}
+    menu.add_item('Analyse Cutting Faces') {self.AnalyseCuttingFaces}
+    menu.add_item('Calculate Cutting Strategy') {self.CalculateCuttingStrategy}
+    menu.add_item('Generate GCode') {self.GenerateGCode}
+    menu.add_item('Export GCode') {self.ExportGCode}
+
+    # Remove everything and generate test models (Used for development purposes)
+    menu.add_item('Generate Test Models') {self.GenerateTestModels}
+
+    # To remove extension (Used for development purposes)
+    menu.add_item('Update Extension') {self.UpdateExtension}
+
+    file_loaded(__FILE__)
 
   end
 

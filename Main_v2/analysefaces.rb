@@ -2,6 +2,8 @@ require 'sketchup.rb'
 
 module AnalyseFaces
 
+  # Check if the faces is top or bottom
+
   def TopBottom face
 
     angle = face.normal.angle_between Geom::Vector3d.new(0,0,1)
@@ -20,6 +22,8 @@ module AnalyseFaces
     end
 
   end
+
+  # Check if the face has too many vertices
 
   def TooManyVertices face
 

@@ -14,17 +14,31 @@ module Main
 
     puts "Analysing model..."
 
+    puts "Model Analysed!"
+
   end
 
   def AnalyseCuttingFaces
 
     puts "Analysing cutting faces..."
 
+    # Analyse each face
+
+    
+
+    puts "Cutting faces analysed!"
+
   end
 
   def CalculateCuttingStrategy
 
     puts "Calculating cutting strategy..."
+
+    # Optimize each cutting faces
+
+    # Optimize cutting and moving path
+
+    puts "Cutting strategy calculated!"
 
   end
 

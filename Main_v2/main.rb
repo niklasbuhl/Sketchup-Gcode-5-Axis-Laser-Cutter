@@ -51,7 +51,7 @@ module Main
 
     ModelFaces.FoundFaces $faceArray
 
-    puts "Faces found!"
+    puts "Faces #{faceArray.count} found!"
 
     puts "Analysing found faces..."
 
@@ -83,6 +83,16 @@ module Main
 
     # Analyse each face
 
+    $cuttingFaceArray.each do |cuttingFace|
+
+      # Analyse shape
+
+      # Analysing vertices
+
+      # Analysing edges
+
+    end
+
     puts "Cutting faces analysed!"
 
   end
@@ -91,11 +101,25 @@ module Main
 
     puts "Calculating cutting strategy..."
 
-    # Optimize each cutting faces
+    # Test cutting strategy 1
 
-    # Optimize cutting and moving path
+    # Test cutting strategy 2A
+
+    # Test cutting strategy 2B
+
+    # Test cutting strategy 3 
 
     puts "Cutting strategy calculated!"
+
+  end
+
+  def self.CalculateTrajectory
+
+    puts "Calculating Trajectory..."
+
+    # Calculate shortest path between vectors
+
+    puts "Trajectory Calculated!"
 
   end
 

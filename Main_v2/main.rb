@@ -26,6 +26,7 @@ module Main
   # Variables
 
   $faceArray = Array.new # Keep track of found faces
+  $cuttingArray = Array.new # Keep track of the faces
 
   $backupModel
 
@@ -51,7 +52,7 @@ module Main
 
     ModelFaces.FoundFaces $faceArray
 
-    puts "Faces #{faceArray.count} found!"
+    puts "Faces #{$faceArray.count} found!"
 
     puts "Analysing found faces..."
 
@@ -67,11 +68,14 @@ module Main
       next if AnalyseFaces.TooAngled face
 
       # Rest of faces is cutting faces
-      #function to color remaining red and put them into cutting faces array
+
+      AnalyseFaces.CutThisFace face, $cuttingArray # Function to color remaining red and put them into cutting faces array
 
     end
 
     puts "Analysed found faces!"
+
+    puts "#{$cuttingArray.count} faces to cut!"
 
     puts "Model Analysed!"
 
@@ -107,7 +111,7 @@ module Main
 
     # Test cutting strategy 2B
 
-    # Test cutting strategy 3 
+    # Test cutting strategy 3
 
     puts "Cutting strategy calculated!"
 

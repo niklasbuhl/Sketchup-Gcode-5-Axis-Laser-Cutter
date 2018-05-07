@@ -53,14 +53,23 @@ module AnalyseFaces
 
           if face.normal.z < - 0.70710678118654 && face.normal.z > 0.70710678118654
 
-            face.material = "red"
-            face.back_material = "red"
+            face.material = "cyan"
+            face.back_material = "cyan"
 
             return true
 
           end
 
           return false
+    end
+
+    def self.CutThisFace face, array
+
+      face.material = "red"
+      face.back_material = "red"
+
+      array.push(face)
+
     end
 
   end

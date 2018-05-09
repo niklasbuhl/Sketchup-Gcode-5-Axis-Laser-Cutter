@@ -9,9 +9,9 @@
 
 =end
 
-module ModelFaces
+module AnalyseModel
 
-  def self.FaceCheck entity, count, array
+  def self.FindFaces entity, count, array
 
     # Loop through all the entities.
 
@@ -31,7 +31,7 @@ module ModelFaces
 
         # puts "Found a ComponentInstance"
 
-        FaceCheck e.definition.entities, count, array # Recursive in the entity
+        FindFaces e.definition.entities, count, array # Recursive in the entity
 
       end
 
@@ -39,7 +39,7 @@ module ModelFaces
 
         # puts "Found a Group"
 
-        FaceCheck e.definition.entities, count, array # Recursive in the entity
+        FindFaces e.definition.entities, count, array # Recursive in the entity
 
       end
 

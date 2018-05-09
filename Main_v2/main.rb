@@ -2,7 +2,7 @@
 
 # Too add to Sketchup on Niklas
 
-  # UI.menu.add_item("Reload My File") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v2/main.rb");}
+  # UI.menu.add_item("G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v2/main.rb");}
 
 # Too add to Sketchup on Jesper
 
@@ -133,7 +133,7 @@ module Main
       AnalyseCuttingFaces.AvailableCuttingEdges thisCuttingFace
 
       # Find a vector parallel to the plane in rectangular to the normal vector upwards
-      AnalyseCutting.FacesPlaneVector thisCuttingFace
+      AnalyseCuttingFaces.PlaneVector thisCuttingFace
 
       $analysedArray.push(thisCuttingFace)
 
@@ -213,7 +213,7 @@ module Main
 
   def self.UpdateExtensionOSX
 
-    puts "Updating modules. v0.6 - OSX"
+    puts "Updating modules. v1.0"
 
     projectdir = File.dirname(__FILE__)
 
@@ -221,20 +221,6 @@ module Main
     load projectdir + "/analysemodel.rb"
     load projectdir + "/analysefaces.rb"
     load projectdir + "/analysecuttingfaces.rb"
-
-    # puts projectdir
-
-  end
-
-  def self.UpdateExtensionWIN
-
-    puts "Updating modules. v0.1 - WIN"
-
-    projectdir = File.dirname(__FILE__)
-
-    load projectdir + "\modelfaces.rb"
-    load projectdir + "\analysefaces.rb"
-    load projectdir + "\analysecuttingfaces.rb"
 
     # puts projectdir
 
@@ -263,8 +249,7 @@ module Main
     menu.add_item('Generate Simple Test Model') {self.GenerateSimpleTestModel}
 
     # To remove extension (Used for development purposes)
-    menu.add_item('Update Extension OSX') {self.UpdateExtensionOSX}
-    menu.add_item('Update Extension WIN') {self.UpdateExtensionWIN}
+    menu.add_item('Update Extension') {self.UpdateExtensionOSX}
 
     file_loaded(__FILE__)
 

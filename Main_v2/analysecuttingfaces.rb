@@ -1,4 +1,4 @@
-require 'sketchup.rb'
+require 'sketchup'
 
 # Class for manipulation of edges and extended information
 
@@ -6,7 +6,7 @@ require 'sketchup.rb'
 
 class ManipulatedVertex
 
-  attr_accessor :origVertex, :thisVector, :projectedVector, :connectedVertexA, :connectedVertexB
+  attr_accessor :origVertex, :thisVector, :projectedVector, :connectedVertexA, :connectedVertexB, :projectedValue
 
   def initialize vertex
 
@@ -22,6 +22,8 @@ class ManipulatedVertex
 
     @projectedVector = Geom::Vector3d.new(vertex.position.x, vertex.position.y, vertex.position.z)
 
+    @projectedValue = 0
+
     puts "Projected Vertex: #{projectedVector.to_s}"
 
   end
@@ -31,7 +33,7 @@ end
 # Class for cutting faces .. Under Development
 class CuttingFace
 
-  attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :verticesXY, :topVertex, :bottomVertex, :sideVertexA, :sideVertexB, :xyAngleOffset
+  attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :verticesXY, :topVertex, :bottomVertex, :outerMostSideVertexA, :outerMostSideVertexB, :xyAngleOffset
 
   def initialize face
 
@@ -77,19 +79,21 @@ module AnalyseCuttingFaces
 
     # Sort the vertices in the cutting face for high-< to low-z
     cuttingFace.manipulatedVertices.sort! { |x,y| y.origVertex.position.z <=> x.origVertex.position.z }
-    puts "Analyzing Top and Bottom vertices."
+    #puts "Analyzing Top and Bottom vertices."
+
     # SSet higest Z
     cuttingFace.topVertex = cuttingFace.manipulatedVertices.first.origVertex
-    puts "Top Z: #{cuttingFace.topVertex.position.z}"
+    #puts "Top Z: #{cuttingFace.topVertex.position.z}"
+
     # Set lowest Z
     cuttingFace.bottomVertex = cuttingFace.manipulatedVertices.last.origVertex
-    puts "Bottom Z: #{cuttingFace.bottomVertex.position.z}"
+    #puts "Bottom Z: #{cuttingFace.bottomVertex.position.z}"
 
   end
 
   def self.XYAngleOffset cuttingFace
 
-    puts "Finding XY angle between X-axis and face XY normal."
+    #puts "Finding XY angle between X-axis and face XY normal."
 
     xVector = Geom::Vector3d.new(1, 0, 0)
 
@@ -97,19 +101,27 @@ module AnalyseCuttingFaces
 
     cuttingFace.xyAngleOffset = xVector.angle_between(newVector)
 
-    puts "Angle: #{cuttingFace.xyAngleOffset.radians}"
+    #puts "Angle: #{cuttingFace.xyAngleOffset.radians}"
 
   end
 
   def self.SideVertices cuttingFace
 
+    thisEntity = cuttingFace.face.parent
+
+    #puts "Entity: #{thisEntity.to_s}"
+    #puts "Entity: #{thisEntity.typename}"
+
+    #puts ""
+    #puts ""
+
     # Get face normal vector
     normal = cuttingFace.face.normal
-    puts "Original Normal #{normal.to_s}"
+    #puts "Original Normal #{normal.to_s}"
 
     # Get XY of normal vector
     normal.z = 0
-    puts "XY Normal #{normal.to_s}"
+    #puts "XY Normal #{normal.to_s}"
 
     # Rotate XY normal vector pi/2
     x = normal.x
@@ -117,11 +129,12 @@ module AnalyseCuttingFaces
 
     normal.x = y
     normal.y = -x
-    puts "Rotated XY Normal #{normal.to_s}"
+    #puts "Rotated XY Normal #{normal.to_s}"
 
     # Start in a vertice
     originVector = Geom::Vector3d.new(cuttingFace.manipulatedVertices.first.origVertex.position.to_a)
-    puts "Start vertex: #{originVector.to_s}"
+    cuttingFace.manipulatedVertices.first.projectedValue = 0
+    #puts "Start vertex: #{originVector.to_s}"
 
     #originVector = cuttingFace.manipulatedVertices.first.thisVector
 
@@ -129,31 +142,64 @@ module AnalyseCuttingFaces
 
     for i in 1..(cuttingFace.vertexCount-1)
 
+      #puts ""
+
       # Creating the vector from start vertex to the other vertices
 
       # Vector to the vertex
       vertexVector = Geom::Vector3d.new(cuttingFace.manipulatedVertices[i].projectedVector)
 
-      puts "Offset Vector: #{vertexVector.to_s}"
+      #puts "Vertex Vector: #{vertexVector.to_s}"
 
       # Calculate vector between start and other vertex
-      cuttingFace.manipulatedVertices[i].projectedVector = vertexVector - originVector
+      vertexVector = vertexVector - originVector
 
       # Remove Z variable
-      cuttingFace.manipulatedVertices[i].projectedVector.z = 0
+      vertexVector.z = 0
 
-      puts "Projected Vector: #{cuttingFace.manipulatedVertices[i].projectedVector.to_s}"
+      #puts "Offset Vector: #{vertexVector.to_s}"
 
       # Project this vectors on the XY rotated normal vector
-      
+      cuttingFace.manipulatedVertices[i].projectedVector = ProjectVector vertexVector, normal
 
-      # Get the relative length of the projected vector from the origin
+      #puts "Projected Vector: #{cuttingFace.manipulatedVertices[i].projectedVector.to_s}"
+
+      # Get the angle between the rotated normal vector and the projected vector - Should be 0 or PI
+      projectedAngle = normal.angle_between(cuttingFace.manipulatedVertices[i].projectedVector)
+      #puts "Projected Vector angle between normal: #{projectedAngle}"
+
+      # Get the relative length of the projected vector from the origin - The projected value
+      projectedLength = cuttingFace.manipulatedVertices[i].projectedVector.length
+
+      # If the projected angle is PI, then assign the value to negative
+      if projectedAngle < 1
+        projectedLength = projectedLength * -1
+      end
+
+      # Save the projectedValue in the vertex
+      cuttingFace.manipulatedVertices[i].projectedValue = projectedLength
 
     end
 
+    puts ""
+
     # Take the length of these vector and sort them, including the origin which is zero
+    cuttingFace.manipulatedVertices.sort! { |x,y| x.projectedValue <=> y.projectedValue }
 
+    cuttingFace.manipulatedVertices.each { |i| puts "Projected Value: #{i.projectedValue}"}
 
+    #puts "Highest projectedValue: #{cuttingFace.manipulatedVertices.first.projectedValue}"
+    #puts "Lowest projectedValue: #{cuttingFace.manipulatedVertices.last.projectedValue}"
+
+    # Save the references to the original vertices
+    cuttingFace.outerMostSideVertexA = cuttingFace.manipulatedVertices.first.origVertex
+    cuttingFace.outerMostSideVertexB = cuttingFace.manipulatedVertices.last.origVertex
+
+    #puts "Outer most side vertex A: #{cuttingFace.outerMostSideVertexA.position.to_s}"
+    #puts "Outer most side vertex B: #{cuttingFace.outerMostSideVertexB.position.to_s}"
+
+    edgeA = $entities.add_edges Geom::Point3d.new(0,0,0), Geom::Point3d.new(cuttingFace.outerMostSideVertexA.position.to_a)
+    edgeB = $entities.add_edges Geom::Point3d.new(0,0,0), Geom::Point3d.new(cuttingFace.outerMostSideVertexB.position.to_a)
 
   end
 
@@ -163,6 +209,22 @@ module AnalyseCuttingFaces
   end
 
   def self.PlaneVector cuttingFace
+
+  end
+
+  def self.ProjectVector vectorA, vectorB
+
+    #puts "Projecting Vector A: #{vectorA.to_s} onto Vector B: #{vectorB.to_s}"
+
+    scalar = ( vectorA % vectorB ) / vectorB.length ** 2
+
+    #puts "Scalar: #{scalar}"
+
+    vector = Geom::Vector3d.new(vectorB.x * scalar, vectorB.y * scalar, vectorB.z * scalar)
+
+    #puts "Result: #{vector.to_s}"
+
+    return vector
 
   end
 

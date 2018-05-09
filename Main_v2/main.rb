@@ -31,6 +31,7 @@ module Main
   # Model and Layers
 
   $model
+  $entities
   $layers
 
   # Face Arrays
@@ -54,6 +55,7 @@ module Main
     puts "Analysing model..."
 
     $model = Sketchup.active_model
+    $entities = $model.active_entities
     $layers = $model.layers
 
     puts "Finding faces..."

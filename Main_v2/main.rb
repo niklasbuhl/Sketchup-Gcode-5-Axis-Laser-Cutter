@@ -2,7 +2,9 @@
 
 # Too add to Sketchup on Niklas
 
-  #
+  # UI.menu.add_item("Reload My File") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v2/main.rb");}
+
+# Too add to Sketchup on Jesper
 
 # Z is the up axis
 
@@ -40,6 +42,12 @@ module Main
   # Primary Methods
 
   # ---
+
+  def self.main_method
+
+    puts "Hello Main Method"
+
+  end
 
   def self.AnalyseModel
 
@@ -123,6 +131,9 @@ module Main
 
       # Edges available as start/end cutting vectors
       AnalyseCuttingFaces.AvailableCuttingEdges thisCuttingFace
+
+      # Find a vector parallel to the plane in rectangular to the normal vector upwards
+      AnalyseCutting.FacesPlaneVector thisCuttingFace
 
       $analysedArray.push(thisCuttingFace)
 

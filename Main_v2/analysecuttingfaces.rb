@@ -32,7 +32,7 @@ end
 
 class ManipulatedVertex
 
-  attr_accessor :origVertex, :thisVertex
+  attr_accessor :origVertex, :thisVertex, :projectedVertex
 
   def initialize vertex
 
@@ -76,10 +76,41 @@ module AnalyseCuttingFaces
 
   def self.SideVertices cuttingFace
 
+    # Get face normal vector
+    normal = cuttingFace.face.normal
+    puts "Original Normal #{normal.to_s}"
+
+    # Get XY of normal vector
+    normal.z = 0
+    puts "XY Normal #{normal.to_s}"
+
+    # Rotate XY normal vector pi/2
+    x = normal.x
+    y = normal.y
+
+    normal.x = y
+    normal.y = -x
+    puts "Rotated XY Normal #{normal.to_s}"
+
+    # Start in a vertice
+    puts "Start vertice #{vertice.first.position.to_s}"
+
+    # Get vector between origin vertice and all others (2 or 3)
+
+    # Project these vectors on the XY rotated normal vector
+
+    # Take the length of these vector and sort them, including the origin which is zero
+
+
+
   end
 
   # Edges available as start/end cutting vectors
   def self.AvailableCuttingEdges cuttingFace
+
+  end
+
+  def self.PlaneVector cuttingFace
 
   end
 

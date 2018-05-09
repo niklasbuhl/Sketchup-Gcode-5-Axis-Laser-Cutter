@@ -51,25 +51,29 @@ module AnalyseFaces
 
     def self.TooAngled face
 
-          if face.normal.z < - 0.70710678118654 && face.normal.z > 0.70710678118654
+      angle = face.normal.angle_between Geom::Vector3d.new(0,0,1)
 
-            face.material = "cyan"
-            face.back_material = "cyan"
+      # If the angle is less than or more than 45 degrees it will be colored cyan
 
-            return true
+    if angle < Math::PI/4 || angle > Math::PI*3/4
 
-          end
+      face.material = "cyan"
+      face.back_material = "cyan"
 
-          return false
-    end
-
-    def self.CutThisFace face, array
-
-      face.material = "red"
-      face.back_material = "red"
-
-      array.push(face)
+      return true
 
     end
+
+    return false
 
   end
+
+  def self.CutThisFace face, array
+
+    face.material = "red"
+    face.back_material = "red"
+
+    array.push(face)
+
+  end
+end

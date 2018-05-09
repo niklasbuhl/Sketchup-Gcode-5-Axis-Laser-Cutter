@@ -6,6 +6,10 @@
 
 # Too add to Sketchup on Jesper
 
+  # UI.menu.add_item("5-Axis") { load("C:\\Projects\\5axis\\Sketchup-Gcode-5-Axis-Laser-Cutter\\Main_v2\\main.rb");}
+
+  # main_method() 
+
 # Z is the up axis
 
 require 'sketchup'
@@ -232,9 +236,10 @@ module Main
 
     projectdir = File.dirname(__FILE__)
 
-    load projectdir + "\modelfaces.rb"
-    load projectdir + "\analysefaces.rb"
-    load projectdir + "\analysecuttingfaces.rb"
+    load projectdir + "/settings.rb"
+    load projectdir + "/analysemodel.rb"
+    load projectdir + "/analysefaces.rb"
+    load projectdir + "/analysecuttingfaces.rb"
 
     # puts projectdir
 

@@ -51,3 +51,55 @@ def color (colored)
       face = face.back_material ="cyan"
 end
 end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+angle = face.normal.angle_between Geom::Vector3d.new(0,0,1)
+
+      angle = angle * 180 / Math::PI/4
+  
+      angle = angle.round
+
+
+          if face.normal.z <= - Math::PI/4 && face.normal.z >= Math::PI/4
+
+            face.material = "cyan"
+            face.back_material = "cyan"
+
+            return true
+
+          end
+
+          return false
+    end
+
+    def self.CutThisFace face, array
+
+      face.material = "red"
+      face.back_material = "red"
+
+      array.push(face)
+
+    end

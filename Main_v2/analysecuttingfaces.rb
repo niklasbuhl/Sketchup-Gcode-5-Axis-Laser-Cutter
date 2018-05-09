@@ -74,9 +74,12 @@ module AnalyseCuttingFaces
 
   end
 
-  def self.ABedgeVectors cuttingFace
+  def self.SideVertices cuttingFace
 
+  end
 
+  # Edges available as start/end cutting vectors
+  def self.AvailableCuttingEdges cuttingFace
 
   end
 

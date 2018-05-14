@@ -44,9 +44,9 @@ class ManipulatedEdge
 
     vector = Geom::Vector3d.new((edge.line)[1])
 
-    angle = vector.angle_between(Geom::Vector3d.new(0,0,1))
+    angle = vector.angle_between(Geom::Vector3d.new(0,0,-1))
 
-    angle - Math::PI if angle > Math::PI 
+    angle - Math::PI if angle > Math::PI
 
     puts "#{vector.to_s} and is angled: #{angle.radians}"
 

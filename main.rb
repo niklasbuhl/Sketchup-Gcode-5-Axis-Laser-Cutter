@@ -2,7 +2,7 @@
 
 # Too add to Sketchup on Niklas
 
-  # UI.menu.add_item("G-Code") { load("/Users/nbxyz/Desktop/Main_v2/main.rb");}
+  # /Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/main.rb
 
 # Too add to Sketchup on Jesper
 

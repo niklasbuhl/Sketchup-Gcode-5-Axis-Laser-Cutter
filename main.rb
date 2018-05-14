@@ -16,6 +16,7 @@ require 'sketchup'
 require_relative 'analysemodel'
 require_relative 'analysefaces'
 require_relative 'analysecuttingfaces'
+require_relative 'calculatecuttingstrategy'
 require_relative 'settings'
 require_relative 'pathalgorithm'
 
@@ -31,10 +32,13 @@ module Main
   include AnalyseFaces
   include AnalyseCuttingFaces
   include PathAlgorithm
+  include CalculateCuttingStrategy
+
 
   # Model and Layers
 
   $model
+  #$modelClone
   $entities
   $layers
 
@@ -43,6 +47,7 @@ module Main
   $faceArray = Array.new # Keep track of found faces
   $cuttingArray = Array.new # Keep track of the faces to be cut
   $analysedArray = Array.new # Keep the CuttingFace class in array
+  $cuttingStrategiesArray = Array.new # Keep track for the cutting strategies
 
   # Primary Methods
 
@@ -58,13 +63,12 @@ module Main
 
     t1 = Time.now
 
-    puts "Analysing model..."
+    puts "Analysing model to find faces..."
 
+    # Updating all sketchup entities
     $model = Sketchup.active_model
     $entities = $model.active_entities
     $layers = $model.layers
-
-    puts "Finding faces..."
 
     foundFacesCount = 0
 
@@ -72,15 +76,16 @@ module Main
     $faceArray.clear
     $cuttingArray.clear
 
-    # Analyse model for faces
+    # New array to keep a clone of the model
+    $modelClone = Array.new
 
-    AnalyseModel.FindFaces $model.entities, foundFacesCount, $faceArray
+    # Analyse model for faces
+    AnalyseModel.FindFaces $model.entities, foundFacesCount, $faceArray, $modelClone
 
     # Color found faces green
-
     AnalyseModel.FoundFaces $faceArray
 
-    puts "Faces #{$faceArray.count} found!"
+    puts "Faces #{$faceArray.count} found! Cloned #{$modelClone.count} faces."
 
     t2 = Time.now
 
@@ -125,6 +130,8 @@ module Main
     puts "Analysing cutting faces..."
 
     t1 = Time.now
+
+    $analysedArray = Array.new
 
     # Clear analysedArray
     $analysedArray.clear
@@ -174,17 +181,29 @@ module Main
 
   def self.CalculateCuttingStrategy
 
-    puts "Calculating cutting strategy..."
+    puts "Calculating cutting strategy for each cutting face..."
 
-    # Test cutting strategy 1
+    t1 = Time.now
 
-    # Test cutting strategy 2A
+    $cuttingStrategiesArray.clear
 
-    # Test cutting strategy 2B
+    $cuttingArray.each do |cuttingFace|
 
-    # Test cutting strategy 3
+      tempFaceCuttingStrategy = FaceCuttingStrategy.new
 
-    puts "Cutting strategy calculated!"
+      # Test cutting strategy 1
+
+      # Test cutting strategy 2A
+
+      # Test cutting strategy 2B
+
+      # Test cutting strategy 3
+
+    end
+
+    t2 = Time.now
+
+    puts "Cutting strategy calculated! It took #{t2 - t1} seconds."
 
   end
 
@@ -250,6 +269,7 @@ module Main
     load projectdir + "/analysemodel.rb"
     load projectdir + "/analysefaces.rb"
     load projectdir + "/analysecuttingfaces.rb"
+    load projectdir + "/calculatecuttingstrategy.rb"
 
     # puts projectdir
 

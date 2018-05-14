@@ -62,7 +62,11 @@ end
 class CuttingFace
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :manipulatedEdges, :verticesXY, :topVertex, :bottomVertex, :outerMostSideVertexA, :outerMostSideVertexB, :xyAngleOffset
+=======
+  attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :verticesXY, :topVertex, :bottomVertex, :sideVertexA, :sideVertexB, :xyAngleOffset
+>>>>>>> parent of adb5acd... stribes to cutting face outmost vertices
 =======
   attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :verticesXY, :topVertex, :bottomVertex, :sideVertexA, :sideVertexB, :xyAngleOffset
 >>>>>>> parent of adb5acd... stribes to cutting face outmost vertices

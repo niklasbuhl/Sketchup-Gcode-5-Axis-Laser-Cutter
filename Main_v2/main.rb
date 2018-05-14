@@ -34,8 +34,8 @@ module Main
 
   $model
   $layers
->>>>>>> parent of adb5acd... stribes to cutting face outmost vertices
 
+  
   # Variables
 
   $faceArray = Array.new # Keep track of found faces

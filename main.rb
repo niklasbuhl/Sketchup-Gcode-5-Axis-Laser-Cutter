@@ -172,12 +172,13 @@ module Main
 
     $faceArray.each do |face|
 
-      PathAlgorithm.Findpoints face 
+      PathAlgorithm.Findpoints face
     # make an array with the points of the found faces
 
-  
+    end
+
   end
-      
+
 
   def self.CalculateCuttingStrategy
 

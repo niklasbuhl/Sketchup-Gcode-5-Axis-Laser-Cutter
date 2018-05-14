@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Project by Jesper Kirial and Niklas Buhl
 
 # Too add to Sketchup on Niklas

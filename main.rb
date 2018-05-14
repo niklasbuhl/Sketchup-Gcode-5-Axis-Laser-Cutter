@@ -31,6 +31,7 @@ module Main
   # Model and Layers
 
   $model
+  $modelClone
   $entities
   $layers
 
@@ -54,13 +55,12 @@ module Main
 
     t1 = Time.now
 
-    puts "Analysing model..."
+    puts "Analysing model to find faces..."
 
+    # Updating all sketchup entities
     $model = Sketchup.active_model
     $entities = $model.active_entities
     $layers = $model.layers
-
-    puts "Finding faces..."
 
     foundFacesCount = 0
 
@@ -68,15 +68,16 @@ module Main
     $faceArray.clear
     $cuttingArray.clear
 
-    # Analyse model for faces
+    # New array to keep a clone of the model
+    $modelClone = Array.new
 
-    AnalyseModel.FindFaces $model.entities, foundFacesCount, $faceArray
+    # Analyse model for faces
+    AnalyseModel.FindFaces $model.entities, foundFacesCount, $faceArray, $modelClone
 
     # Color found faces green
-
     AnalyseModel.FoundFaces $faceArray
 
-    puts "Faces #{$faceArray.count} found!"
+    puts "Faces #{$faceArray.count} found! Cloned #{$modelClone.count} faces."
 
     t2 = Time.now
 

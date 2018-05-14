@@ -61,8 +61,10 @@ end
 # Class for cutting faces .. Under Development
 class CuttingFace
 
-  attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :verticesXY, :topVertex, :bottomVertex, :sideVertexA, :sideVertexB, :xyAngleOffset
 
+  attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :manipulatedEdges, :verticesXY, :topVertex, :bottomVertex, :outerMostSideVertexA, :outerMostSideVertexB, :xyAngleOffset
+
+ 
   def initialize face
 
     # Keep pointer to face

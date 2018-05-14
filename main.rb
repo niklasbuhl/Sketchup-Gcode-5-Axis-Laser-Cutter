@@ -14,6 +14,7 @@ require 'sketchup'
 require_relative 'analysemodel'
 require_relative 'analysefaces'
 require_relative 'analysecuttingfaces'
+require_relative 'calculatecuttingstrategy'
 require_relative 'settings'
 
 module Main
@@ -27,11 +28,12 @@ module Main
   include AnalyseModel
   include AnalyseFaces
   include AnalyseCuttingFaces
+  include CalculateCuttingStrategy
 
   # Model and Layers
 
   $model
-  $modelClone
+  #$modelClone
   $entities
   $layers
 
@@ -40,6 +42,7 @@ module Main
   $faceArray = Array.new # Keep track of found faces
   $cuttingArray = Array.new # Keep track of the faces to be cut
   $analysedArray = Array.new # Keep the CuttingFace class in array
+  $cuttingStrategiesArray = Array.new # Keep track for the cutting strategies
 
   # Primary Methods
 
@@ -123,6 +126,8 @@ module Main
 
     t1 = Time.now
 
+    $analysedArray = Array.new
+
     # Clear analysedArray
     $analysedArray.clear
 
@@ -160,17 +165,29 @@ module Main
 
   def self.CalculateCuttingStrategy
 
-    puts "Calculating cutting strategy..."
+    puts "Calculating cutting strategy for each cutting face..."
 
-    # Test cutting strategy 1
+    t1 = Time.now
 
-    # Test cutting strategy 2A
+    $cuttingStrategiesArray.clear
 
-    # Test cutting strategy 2B
+    $cuttingArray.each do |cuttingFace|
 
-    # Test cutting strategy 3
+      tempFaceCuttingStrategy = FaceCuttingStrategy.new
 
-    puts "Cutting strategy calculated!"
+      # Test cutting strategy 1
+
+      # Test cutting strategy 2A
+
+      # Test cutting strategy 2B
+
+      # Test cutting strategy 3
+
+    end
+
+    t2 = Time.now
+
+    puts "Cutting strategy calculated! It took #{t2 - t1} seconds."
 
   end
 
@@ -236,6 +253,7 @@ module Main
     load projectdir + "/analysemodel.rb"
     load projectdir + "/analysefaces.rb"
     load projectdir + "/analysecuttingfaces.rb"
+    load projectdir + "/calculatecuttingstrategy.rb"
 
     # puts projectdir
 

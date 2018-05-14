@@ -1,70 +1,58 @@
-include 'sketchup'
+require 'sketchup'
+
+class FaceCuttingStrategy
+
+  attr_accessor :type, :rayStartPosition, :rayStartOrientation, :rayEndPosition, :rayEndOrientation, :gcode
+
+  def initialize
+
+    @type = nil
+
+    $rayStartPosition = Geom::Point3d.new(0,0,0)
+
+    $rayEndPosition = Geom::Point3d.new(0,0,0)
+
+    $rayStartOrientation = Array.new(2)
+
+    $rayEndOrientation = Array.new(2)
+
+    $gcode = Array.new(5)
+
+  end
+
+end
 
 module CalculateCuttingStrategy
 
-  def GenerateCloneModel faceArrayClone
+  def CheckPenetration
 
-    # Add layer
-    layer = $layers.add "Penetration Layer"
-
-    # Change Layer
-    $model.active_layer = layer
-
-    # Generate face from each of the faces in the original model
-    faceArrayClone.each do |faceArray|
-
-      # Add the face to the active model in the clone
-      tempFace = $entities.add_face(faceArray)
-
-    end
-
-  end
-
-  def RemoveCloneModel
-
-    Sketchup.active_model.layers.remove("Penetration Layer", true)
-
-  end
-
-  def CheckPenetration cuttingTrajectoryGeometry
+    # RAYTEST
 
     return true # No penetration
 
   end
 
-  def GenerateStrategyA cuttingFace
+  def CalculateXYplaneIntersection
 
-    return cuttingTrajectoryGeometry
+  end
+
+  def CalculateLaserHeight
+
+  end
+
+  def GenerateStrategyA cuttingFace
 
   end
 
   def GenerateStrategyB1 cuttingFace
 
-    return cuttingTrajectoryGeometry
-
   end
 
   def GenerateStrategyB2 cuttingFace
 
-    return cuttingTrajectoryGeometry
-
   end
 
-  def GenerateStrategyC1 cuttingFace
-
-    return cuttingTrajectoryGeometry
-
-  end
-
-  def GenerateStrategyC2 cuttingFace
-
-    return cuttingTrajectoryGeometry
-
-  end
-
-  def GenerateStrategyD cuttingFace
-
-    return cuttingTrajectoryGeometry
+  def GenerateStrategyC cuttingFace
 
   end
 

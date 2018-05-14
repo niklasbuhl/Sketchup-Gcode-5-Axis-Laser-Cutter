@@ -27,17 +27,17 @@ module AnalyseModel
         vertices = e.vertices
 
         # New array to keep all the vertices (3dPoint)
-        faceClone = Array.new
+        #faceClone = Array.new
 
         vertices.each do |vertex|
 
           point = Geom::Point3d.new(vertex.position)
 
-          faceClone.push(point)
+          #faceClone.push(point)
 
         end
 
-        modelClone.push(faceClone)
+        #modelClone.push(faceClone)
 
         # Copy all the vertices
         #puts "Entity is a Face! Current count is: #{count}"

@@ -10,21 +10,21 @@ class ManipulatedVertex
 
   def initialize vertex
 
-    puts "Creating new manipulated vertex"
+    #puts "Creating new manipulated vertex"
 
     @origVertex = vertex
 
-    puts "Original Vertex: #{origVertex.to_s}"
+    #puts "Original Vertex: #{origVertex.to_s}"
 
     @thisVector = Geom::Vector3d.new(vertex.position.x, vertex.position.y, vertex.position.z)
 
-    puts "This Vertex: #{thisVector.to_s}"
+    #puts "This Vertex: #{thisVector.to_s}"
 
     @projectedVector = Geom::Vector3d.new(vertex.position.x, vertex.position.y, vertex.position.z)
 
     @projectedValue = 0
 
-    puts "Projected Vertex: #{projectedVector.to_s}"
+    #puts "Projected Vertex: #{projectedVector.to_s}"
 
   end
 
@@ -56,7 +56,7 @@ class ManipulatedEdge
 
     @cutable = true if angle < Math::PI/4 || angle > Math::PI*3/4
 
-    puts "#{vector.to_s} and is angled: #{angle.radians}, Cutable: #{cutable}"
+    #puts "#{vector.to_s} and is angled: #{angle.radians}, Cutable: #{cutable}"
 
     # Neighboor Edges on same face
 
@@ -76,7 +76,7 @@ class ManipulatedEdge
 
         @neighboorEdges.push(edge)
 
-        puts "Neighboor edge: #{@neighboorEdges.last}"
+        #puts "Neighboor edge: #{@neighboorEdges.last}"
 
         next
 
@@ -84,7 +84,7 @@ class ManipulatedEdge
 
       @oppositeEdge = edge
 
-      puts "Opposite Edge: #{@oppositeEdge}"
+      #puts "Opposite Edge: #{@oppositeEdge}"
 
     end
 
@@ -136,7 +136,7 @@ class CuttingFace
 
     end
 
-    puts "Creating new cutting face. With #{@vertexCount} vertices, #{@edgeCount} edges."
+    #puts "Creating new cutting face. With #{@vertexCount} vertices, #{@edgeCount} edges."
 
     # Print before sort
     #@vertices.each { |vertex| puts "#{vertex.position.z}"}
@@ -259,12 +259,12 @@ module AnalyseCuttingFaces
 
     end
 
-    puts ""
+    # puts ""
 
     # Take the length of these vector and sort them, including the origin which is zero
     cuttingFace.manipulatedVertices.sort! { |x,y| x.projectedValue <=> y.projectedValue }
 
-    cuttingFace.manipulatedVertices.each { |i| puts "Projected Value: #{i.projectedValue}"}
+    # cuttingFace.manipulatedVertices.each { |i| puts "Projected Value: #{i.projectedValue}"}
 
     #puts "Highest projectedValue: #{cuttingFace.manipulatedVertices.first.projectedValue}"
     #puts "Lowest projectedValue: #{cuttingFace.manipulatedVertices.last.projectedValue}"
@@ -276,8 +276,8 @@ module AnalyseCuttingFaces
     #puts "Outer most side vertex A: #{cuttingFace.outerMostSideVertexA.position.to_s}"
     #puts "Outer most side vertex B: #{cuttingFace.outerMostSideVertexB.position.to_s}"
 
-    edgeA = $entities.add_edges Geom::Point3d.new(0,0,0), Geom::Point3d.new(cuttingFace.outerMostSideVertexA.position.to_a)
-    edgeB = $entities.add_edges Geom::Point3d.new(0,0,0), Geom::Point3d.new(cuttingFace.outerMostSideVertexB.position.to_a)
+    #edgeA = $entities.add_edges Geom::Point3d.new(0,0,0), Geom::Point3d.new(cuttingFace.outerMostSideVertexA.position.to_a)
+    #edgeB = $entities.add_edges Geom::Point3d.new(0,0,0), Geom::Point3d.new(cuttingFace.outerMostSideVertexB.position.to_a)
 
   end
 

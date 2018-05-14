@@ -1,9 +1,0 @@
-
-UI.menu.add_item("Reload My File") { load("path to main file");}
-
-
-
-C:\Projects\ruby\figure_input\main.rb
-
-
-UI.menu.add_item("Reload My File") { load("C:\Projects\ruby\figure_input\main.rb");}

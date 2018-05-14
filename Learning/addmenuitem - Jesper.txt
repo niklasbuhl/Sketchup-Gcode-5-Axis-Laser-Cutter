@@ -1,4 +1,0 @@
-UI.menu.add_item("Reload My File") { load("C:\Projects\5axis\Sketchup-Gcode-5-Axis-Laser-Cutter\Main_v2\main.rb"); main_method() }
-
-
-UI.menu.add_item("Reload My File") { load("C:\Projects\ruby\Jesper2.rb"); main_method() }

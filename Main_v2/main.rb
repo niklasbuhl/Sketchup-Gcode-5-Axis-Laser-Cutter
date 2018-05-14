@@ -27,8 +27,7 @@ module Main
 
   include ModelFaces
   include AnalyseFaces
-<<<<<<< HEAD
-=======
+  include AnalyseCuttingFaces
   include AnalyseCuttingFaces
 
   # Model and Layers
@@ -51,12 +50,9 @@ module Main
 
     puts "Analysing model..."
 
-<<<<<<< HEAD
-=======
     $model = Sketchup.active_model
     $layers = $model.layers
 
->>>>>>> parent of adb5acd... stribes to cutting face outmost vertices
     puts "Finding faces..."
 
     foundFacesCount = 0

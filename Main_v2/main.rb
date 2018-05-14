@@ -1,20 +1,21 @@
+<<<<<<< HEAD
 # Project by Jesper Kirial and Niklas Buhl
 
 # Too add to Sketchup on Niklas
 
-  # UI.menu.add_item("G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v2/main.rb");}
+  # UI.menu.add_item("Reload My File") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/Main_v2/main.rb");}
 
 # Too add to Sketchup on Jesper
 
-# Z is the up axis
+  # UI.menu.add_item("5-Axis reload") { load("C:\\Projects\\5axis\\Sketchup-Gcode-5-Axis-Laser-Cutter\\Main_v2\\main.rb");}
+
 
 require 'sketchup'
 # require 'os' # https://rubygems.org/gems/os // How to add it into the Skethcup path
 
-require_relative 'analysemodel'
+require_relative 'modelfaces'
 require_relative 'analysefaces'
 require_relative 'analysecuttingfaces'
-require_relative 'settings'
 
 module Main
 
@@ -24,65 +25,38 @@ module Main
 
   # Includes
 
-  include AnalyseModel
+  include ModelFaces
   include AnalyseFaces
-  include AnalyseCuttingFaces
 
-  # Model and Layers
-
-  $model
-  $entities
-  $layers
-
-  # Face Arrays
+  # Variables
 
   $faceArray = Array.new # Keep track of found faces
-  $cuttingArray = Array.new # Keep track of the faces to be cut
-  $analysedArray = Array.new # Keep the CuttingFace class in array
+
+  # ---
 
   # Primary Methods
 
   # ---
 
-  def self.main_method
-
-    puts "Hello Main Method"
-
-  end
-
   def self.AnalyseModel
 
     puts "Analysing model..."
-
-    $model = Sketchup.active_model
-    $entities = $model.active_entities
-    $layers = $model.layers
 
     puts "Finding faces..."
 
     foundFacesCount = 0
 
-    # Clear faceArray and cuttingArray
-    $faceArray.clear
-    $cuttingArray.clear
-
     # Analyse model for faces
 
-    AnalyseModel.FindFaces $model.entities, foundFacesCount, $faceArray
+    ModelFaces.FaceCheck Sketchup.active_model.entities, foundFacesCount, $faceArray
 
     # Color found faces green
 
-    AnalyseModel.FoundFaces $faceArray
+    ModelFaces.FoundFaces $faceArray
 
-    puts "Faces #{$faceArray.count} found!"
+    puts "Faces found!"
 
-    puts "Model analysed!"
-
-  end
-
-  def self.AnalyseFaces
-
-    puts "Analysing faces..."
+    puts "Analysing found faces..."
 
     $faceArray.each do |face|
 
@@ -96,15 +70,13 @@ module Main
       next if AnalyseFaces.TooAngled face
 
       # Rest of faces is cutting faces
-      AnalyseFaces.CutThisFace face, $cuttingArray # Function to color remaining red and put them into cutting faces array
+      #function to color remaining red and put them into cutting faces array
 
     end
 
     puts "Analysed found faces!"
 
-    puts "#{$cuttingArray.count} faces to cut!"
-
-    puts "Faces Analysed!"
+    puts "Model Analysed!"
 
   end
 
@@ -112,36 +84,9 @@ module Main
 
     puts "Analysing cutting faces..."
 
-    # Clear analysedArray
-    $analysedArray.clear
-
-    new_layer = $layers.add "Analysing Layer"
-
     # Analyse each face
-    $cuttingArray.each do |cuttingFace|
 
-      thisCuttingFace = CuttingFace.new cuttingFace
-
-      # Analyse top and bottom vertices
-      AnalyseCuttingFaces.TopBottomZ thisCuttingFace
-
-      # Analysing angle offset
-      AnalyseCuttingFaces.XYAngleOffset thisCuttingFace
-
-      # Analysing most side vertices
-      AnalyseCuttingFaces.SideVertices thisCuttingFace
-
-      # Edges available as start/end cutting vectors
-      AnalyseCuttingFaces.AvailableCuttingEdges thisCuttingFace
-
-      # Find a vector parallel to the plane in rectangular to the normal vector upwards
-      AnalyseCuttingFaces.PlaneVector thisCuttingFace
-
-      $analysedArray.push(thisCuttingFace)
-
-    end
-
-    puts "#{$analysedArray.count} cutting faces analysed!"
+    puts "Cutting faces analysed!"
 
   end
 
@@ -149,25 +94,11 @@ module Main
 
     puts "Calculating cutting strategy..."
 
-    # Test cutting strategy 1
+    # Optimize each cutting faces
 
-    # Test cutting strategy 2A
-
-    # Test cutting strategy 2B
-
-    # Test cutting strategy 3
+    # Optimize cutting and moving path
 
     puts "Cutting strategy calculated!"
-
-  end
-
-  def self.CalculateTrajectory
-
-    puts "Calculating Trajectory..."
-
-    # Calculate shortest path between vectors
-
-    puts "Trajectory Calculated!"
 
   end
 
@@ -191,38 +122,31 @@ module Main
 
   def self.GenerateTestModels
 
-    puts "Generate Test Models. v0.2"
-
-    model = Sketchup.active_model
-
-    testModelPath = File.join(File.dirname(__FILE__),'/test-geometrier-laser.skp')
-
-    model.import(testModelPath)
-
-  end
-
-  def self.GenerateSimpleTestModel
-
-    puts "Generate Simple Test Model. v0.1"
-
-    model = Sketchup.active_model
-
-    testModelPath = File.join(File.dirname(__FILE__),'/test-simplemodel.skp')
-
-    model.import(testModelPath)
-
   end
 
   def self.UpdateExtensionOSX
 
-    puts "Updating modules. v1.0"
+    puts "Updating modules. v0.6 - OSX"
 
     projectdir = File.dirname(__FILE__)
 
-    load projectdir + "/settings.rb"
-    load projectdir + "/analysemodel.rb"
+    load projectdir + "/modelfaces.rb"
     load projectdir + "/analysefaces.rb"
     load projectdir + "/analysecuttingfaces.rb"
+
+    # puts projectdir
+
+  end
+
+  def self.UpdateExtensionWIN
+
+    puts "Updating modules. v0.1 - WIN"
+
+    projectdir = File.dirname(__FILE__)
+
+    load projectdir + "\modelfaces.rb"
+    load projectdir + "\analysefaces.rb"
+    load projectdir + "\analysecuttingfaces.rb"
 
     # puts projectdir
 
@@ -239,19 +163,17 @@ module Main
     menu = UI.menu('Plugins')
 
     menu.add_item('Analyse Model') {self.AnalyseModel}
-    menu.add_item('Analyse Faces') {self.AnalyseFaces}
     menu.add_item('Analyse Cutting Faces') {self.AnalyseCuttingFaces}
     menu.add_item('Calculate Cutting Strategy') {self.CalculateCuttingStrategy}
-    menu.add_item('Calculate Cutting Trajectory') {self.CalculateCuttingTrajectory}
     menu.add_item('Generate GCode') {self.GenerateGCode}
     menu.add_item('Export GCode') {self.ExportGCode}
 
     # Remove everything and generate test models (Used for development purposes)
     menu.add_item('Generate Test Models') {self.GenerateTestModels}
-    menu.add_item('Generate Simple Test Model') {self.GenerateSimpleTestModel}
 
     # To remove extension (Used for development purposes)
-    menu.add_item('Update Extension') {self.UpdateExtensionOSX}
+    menu.add_item('Update Extension OSX') {self.UpdateExtensionOSX}
+    menu.add_item('Update Extension WIN') {self.UpdateExtensionWIN}
 
     file_loaded(__FILE__)
 

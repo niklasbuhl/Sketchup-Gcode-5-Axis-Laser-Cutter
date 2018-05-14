@@ -6,7 +6,7 @@
 
 # Too add to Sketchup on Jesper
 
-  #UI.menu.add_item("G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\main.rb");}
+  #     UI.menu.add_item("G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\main.rb");}
 
 # Z is the up axis
 
@@ -18,6 +18,7 @@ require_relative 'analysefaces'
 require_relative 'analysecuttingfaces'
 require_relative 'calculatecuttingstrategy'
 require_relative 'settings'
+require_relative 'pathalgorithm'
 
 module Main
 
@@ -30,7 +31,9 @@ module Main
   include AnalyseModel
   include AnalyseFaces
   include AnalyseCuttingFaces
+  include PathAlgorithm
   include CalculateCuttingStrategy
+
 
   # Model and Layers
 
@@ -165,6 +168,17 @@ module Main
 
   end
 
+  def self.PathAlgorithm
+
+    $faceArray.each do |face|
+
+      PathAlgorithm.Findpoints face 
+    # make an array with the points of the found faces
+
+  
+  end
+      
+
   def self.CalculateCuttingStrategy
 
     puts "Calculating cutting strategy for each cutting face..."
@@ -278,6 +292,7 @@ module Main
     menu.add_item('Calculate Cutting Trajectory') {self.CalculateCuttingTrajectory}
     menu.add_item('Generate GCode') {self.GenerateGCode}
     menu.add_item('Export GCode') {self.ExportGCode}
+    menu.add_item('Find points in faces') {self.PathAlgorithm}
 
     # Remove everything and generate test models (Used for development purposes)
     menu.add_item('Generate Test Models') {self.GenerateTestModels}

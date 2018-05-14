@@ -30,10 +30,38 @@ class ManipulatedVertex
 
 end
 
+class ManipulatedEdge
+
+  attr_accessor :origEdge, :cutable, :neighboor
+
+  def initialize edge
+
+    @origEdge = edge
+
+    # Check for neighboor edges
+
+    # Check for cutability, not more than PI/4 i Z-axis
+
+    vector = Geom::Vector3d.new((edge.line)[1])
+
+    angle = vector.angle_between(Geom::Vector3d.new(0,0,1))
+
+    angle - Math::PI if angle > Math::PI 
+
+    puts "#{vector.to_s} and is angled: #{angle.radians}"
+
+
+
+    #
+
+  end
+
+end
+
 # Class for cutting faces .. Under Development
 class CuttingFace
 
-  attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :verticesXY, :topVertex, :bottomVertex, :outerMostSideVertexA, :outerMostSideVertexB, :xyAngleOffset
+  attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :manipulatedEdges, :verticesXY, :topVertex, :bottomVertex, :outerMostSideVertexA, :outerMostSideVertexB, :xyAngleOffset
 
   def initialize face
 
@@ -46,10 +74,22 @@ class CuttingFace
     # Keep vertex count
     @vertexCount = @face.vertices.count
 
-    # Initialize as array
+    # Initalize edge array
+    @manipulatedEdges = Array.new
+
+    # Assign all edges to the array for analyse
+    @face.edges.each do |edge|
+
+      tempEdge = ManipulatedEdge.new edge
+
+      @manipulatedEdges.push(tempEdge)
+
+    end
+
+    # Initialize vertex array
     @manipulatedVertices = Array.new
 
-    # Assign all vertices to an array for manipulation
+    # Assign all vertices to an array for analyse
     @face.vertices.each do |vertex|
 
       tempManipulatedVertex = ManipulatedVertex.new vertex

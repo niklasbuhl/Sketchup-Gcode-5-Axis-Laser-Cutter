@@ -6,6 +6,8 @@
 
 # Too add to Sketchup on Jesper
 
+  #UI.menu.add_item("G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\main.rb");}
+
 # Z is the up axis
 
 require 'sketchup'

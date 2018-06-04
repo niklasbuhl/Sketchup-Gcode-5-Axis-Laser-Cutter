@@ -44,6 +44,7 @@ module Main
 
   # Face Arrays
 
+  $edgeArray = Array.new # Collect all edges
   $faceArray = Array.new # Keep track of found faces
   $cuttingArray = Array.new # Keep track of the faces to be cut
   $analysedArray = Array.new # Keep the CuttingFace class in array
@@ -70,22 +71,19 @@ module Main
     $entities = $model.active_entities
     $layers = $model.layers
 
-    foundFacesCount = 0
-
     # Clear faceArray and cuttingArray
     $faceArray.clear
+    $edgeArray.clear
     $cuttingArray.clear
 
-    # New array to keep a clone of the model
-    $modelClone = Array.new
-
     # Analyse model for faces
-    AnalyseModel.FindFaces $model.entities, foundFacesCount, $faceArray, $modelClone
+    AnalyseModel.FindFaces $model.entities
 
     # Color found faces green
     AnalyseModel.FoundFaces $faceArray
 
-    puts "Faces #{$faceArray.count} found! Cloned #{$modelClone.count} faces."
+    puts "#{$faceArray.count} faces found!"
+    puts "#{$edgeArray.count} edges found!"
 
     t2 = Time.now
 
@@ -153,10 +151,10 @@ module Main
       AnalyseCuttingFaces.SideVertices thisCuttingFace
 
       # Edges available as start/end cutting vectors
-      AnalyseCuttingFaces.AvailableCuttingEdges thisCuttingFace
+      #AnalyseCuttingFaces.AvailableCuttingEdges thisCuttingFace
 
       # Find a vector parallel to the plane in rectangular to the normal vector upwards
-      AnalyseCuttingFaces.PlaneVector thisCuttingFace
+      #AnalyseCuttingFaces.PlaneVector thisCuttingFace
 
       $analysedArray.push(thisCuttingFace)
 

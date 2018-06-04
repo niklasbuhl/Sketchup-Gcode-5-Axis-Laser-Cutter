@@ -64,40 +64,12 @@ class ManipulatedEdge
 
   end
 
-  def ClassifyEdges face
-
-    edges = face.edges
-
-    edges.each do |edge|
-
-      next if edge == @origEdge
-
-      if @origEdge.start == edge.start || @origEdge.start == edge.end || @origEdge.end == edge.start || @origEdge.end == edge.end
-
-        @neighboorEdges.push(edge)
-
-        #puts "Neighboor edge: #{@neighboorEdges.last}"
-
-        next
-
-      end
-
-      @oppositeEdge = edge
-
-      #puts "Opposite Edge: #{@oppositeEdge}"
-
-    end
-
-  end
-
 end
 
 # Class for cutting faces .. Under Development
 class CuttingFace
 
-
   attr_accessor :face, :edgeCount, :edges, :vertexCount, :manipulatedVertices, :manipulatedEdges, :verticesXY, :topVertex, :bottomVertex, :outerMostSideVertexA, :outerMostSideVertexB, :xyAngleOffset
-
 
   def initialize face
 
@@ -117,8 +89,6 @@ class CuttingFace
     @face.edges.each do |edge|
 
       tempEdge = ManipulatedEdge.new edge
-
-      tempEdge.ClassifyEdges face
 
       @manipulatedEdges.push(tempEdge)
 
@@ -283,6 +253,32 @@ module AnalyseCuttingFaces
 
   # Edges available as start/end cutting vectors
   def self.AvailableCuttingEdges cuttingFace
+
+      #tempEdge.ClassifyEdges face
+
+      edges = cuttingFace.origFace.edges
+
+      edges.each do |edge|
+
+        tempManipulatedEdge = ManipulatedEdge.new(edge)
+
+        next if edge == @origEdge
+
+          if @origEdge.start == edge.start || @origEdge.start == edge.end || @origEdge.end == edge.start || @origEdge.end == edge.end
+
+            @neighboorEdges.push(edge)
+
+            #puts "Neighboor edge: #{@neighboorEdges.last}"
+
+            next
+
+          end
+
+          @oppositeEdge = edge
+
+          #puts "Opposite Edge: #{@oppositeEdge}"
+
+        end
 
   end
 

@@ -11,7 +11,7 @@
 
 module AnalyseModel
 
-  def self.FindFaces entity, count, array, modelClone
+  def self.FindFaces entity
 
     # Loop through all the entities.
 
@@ -19,28 +19,13 @@ module AnalyseModel
 
       if e.is_a?(Sketchup::Face) # Check if it is a Face.
 
-        count += 1 # Increment by 1
+        $faceArray.push(e) # Add the Face to the array
 
-        array.push(e) # Add the Face to the array
+      end
 
-        # Get all vertices in the face
-        vertices = e.vertices
+      if e.is_a? (Sketchup::Edge)
 
-        # New array to keep all the vertices (3dPoint)
-        #faceClone = Array.new
-
-        vertices.each do |vertex|
-
-          point = Geom::Point3d.new(vertex.position)
-
-          #faceClone.push(point)
-
-        end
-
-        #modelClone.push(faceClone)
-
-        # Copy all the vertices
-        #puts "Entity is a Face! Current count is: #{count}"
+        $edgeArray.push(e)
 
       end
 
@@ -48,7 +33,7 @@ module AnalyseModel
 
         # puts "Found a ComponentInstance"
 
-        FindFaces e.definition.entities, count, array # Recursive in the entity
+        FindFaces e.definition.entities # Recursive in the entity
 
       end
 
@@ -56,7 +41,7 @@ module AnalyseModel
 
         # puts "Found a Group"
 
-        FindFaces e.definition.entities, count, array # Recursive in the entity
+        FindFaces e.definition.entities # Recursive in the entity
 
       end
 

@@ -17,6 +17,7 @@ require_relative 'analysemodel'
 require_relative 'analysefaces'
 require_relative 'analysecuttingfaces'
 require_relative 'calculatecuttingstrategy'
+require_relative 'calculatecuttingstrategyv2'
 require_relative 'settings'
 require_relative 'pathalgorithm'
 
@@ -33,6 +34,7 @@ module Main
   include AnalyseCuttingFaces
   include PathAlgorithm
   include CalculateCuttingStrategy
+  include CalculateCuttingStrategyV2
 
 
   # Model and Layers
@@ -47,6 +49,9 @@ module Main
   $edgeArray = Array.new # Collect all edges
   $faceArray = Array.new # Keep track of found faces
   $cuttingArray = Array.new # Keep track of the faces to be cut
+  $cuttingStrategy = Array.new # Keep track of cutting strategies
+
+
   $analysedArray = Array.new # Keep the CuttingFace class in array
   $cuttingStrategiesArray = Array.new # Keep track for the cutting strategies
 
@@ -120,6 +125,82 @@ module Main
     t2 = Time.now
 
     puts "Faces Analysed! It took #{t2 - t1} seconds."
+
+  end
+
+  def self.CalculateCuttingStrategyV2
+
+    puts "Calculating cutting faces..."
+
+    t1 = Time.now
+
+    $cuttingStrategy = Array.new
+    $cuttingStrategy.clear
+
+    $cuttingArray.each do |cuttingFace|
+
+      # -- Cutting Strategy 1
+
+      # 1. Find OuterVertices
+
+      outerVertices = Array.new()
+
+      # 2. Generate cutting lines from outer vertices into Lines[0,1]
+
+      # 3. Raytest: Lines[0] & Line [i], if true, save and next face
+
+      # --- Cutting Strategy 2
+
+      # 4. For each outer vertex
+
+      outerVertices.each_with_index do |outerVertex, index|
+
+        # 4.1 Find cuttable edge from outerVertex
+
+        edges = outerVertex.edges
+
+        edges.each do |edge|
+
+          # 4.4.1 Check if the edge is on the face
+          next unless edge.used_by(cuttingFace)
+
+          # 4.4.2 Check if the edge is less that 45 degress
+          next if edge.line[1].angle_between(Geom::Vector.new(0,0,0)) > Math::PI / 2
+
+          # 4.4.3 Check if the edge is more that 135 degress
+          next if edge.line[1].angle_between(Geom::Vector.new(0,0,0)) < 3 * Math::PI / 4
+
+          # 4.4.3 Generate cutting line from edge(vector) and outer vertex Lines[index]
+
+          # 4.4.4 Raytest: Lines[index]: If true, continue
+          cuttingFace.vertices.each do |faceVertex|
+
+            # 4.4.4.1 Check if the vertex is used by the original edge
+            next if faceVertex.used_by(edge)
+
+            # 4.4.4.2 Generate cutting line from the vertex and vector from the edge
+
+            # 4.4.4.3 Raytest: Outer vertex cutting line and cutting line from the vertices
+
+        end
+
+
+
+
+
+        # 4.4 For other vertices not connected to the edge
+
+
+
+      end
+
+
+
+      # --- Cutting Strategy 3 (Viften)
+
+
+
+    end
 
   end
 

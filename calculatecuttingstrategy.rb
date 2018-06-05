@@ -16,8 +16,6 @@ class FaceCuttingStrategy
 
     $rayEndOrientation = Array.new(2)
 
-    $gcode = Array.new(5)
-
   end
 
 end

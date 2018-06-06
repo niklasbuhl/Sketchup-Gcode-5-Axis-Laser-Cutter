@@ -2,7 +2,11 @@
 
 # Too add to Sketchup on Niklas
 
-  # UI.menu.add_item("G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/main.rb");}
+=begin
+
+UI.menu.add_item("G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/main.rb");}
+
+=end
 
 # Too add to Sketchup on Jesper
 
@@ -15,8 +19,8 @@ require 'sketchup'
 
 require_relative 'analysemodel'
 require_relative 'analysefaces'
-require_relative 'analysecuttingfaces'
-require_relative 'calculatecuttingstrategy'
+#require_relative 'analysecuttingfaces'
+#require_relative 'calculatecuttingstrategy'
 require_relative 'calculatecuttingstrategyv2'
 require_relative 'settings'
 require_relative 'pathalgorithm'
@@ -31,10 +35,15 @@ module Main
 
   include AnalyseModel
   include AnalyseFaces
-  include AnalyseCuttingFaces
-  include PathAlgorithm
+
   include CalculateCuttingStrategy
-  include CalculateCuttingStrategyV2
+  include PathAlgorithm
+
+
+
+  #include CalculateCuttingStrategy
+  #include AnalyseCuttingFaces
+
 
 
   # Model and Layers
@@ -128,9 +137,9 @@ module Main
 
   end
 
-  def self.CalculateCuttingStrategyV2
+  def self.CalculateCuttingStrategy
 
-    puts "Calculating cutting faces..."
+    puts "Calculating cutting faces (Version 0.2)..."
 
     t1 = Time.now
 
@@ -141,19 +150,30 @@ module Main
 
       # -- Cutting Strategy 1
 
-      # 1. Find OuterVertices
+      # 0. Create new face cutting strategy
 
-      outerVertices = Array.new()
+      faceCuttingStrategy = FaceCuttingStrategy.new(cuttingFace)
+
+      CalculateCuttingStrategy.TopBottomVertices faceCuttingStrategy
+
+      # 1. Find OuterVertices
+      CalculateCuttingStrategy.OuterVertices faceCuttingStrategy
 
       # 2. Generate cutting lines from outer vertices into Lines[0,1]
+      vector = CalculateCuttingStrategy.UpVector(faceCuttingStrategy)
 
       # 3. Raytest: Lines[0] & Line [i], if true, save and next face
+      CalculateCuttingStrategy.GenerateCuttingLine faceCuttingStrategy.outerVertices[0].position, vector
+
+      CalculateCuttingStrategy.GenerateCuttingLine faceCuttingStrategy.outerVertices[1].position, vector
 
       # --- Cutting Strategy 2
 
       # 4. For each outer vertex
 
-      outerVertices.each_with_index do |outerVertex, index|
+      #puts "This vertex: #{faceCuttingStrategy.outerVertices[0]}"
+
+      faceCuttingStrategy.outerVertices.each_with_index do |outerVertex, index|
 
         # 4.1 Find cuttable edge from outerVertex
 
@@ -161,14 +181,20 @@ module Main
 
         edges.each do |edge|
 
+          #puts "This is: #{edge}"
+
           # 4.4.1 Check if the edge is on the face
-          next unless edge.used_by(cuttingFace)
+          next unless edge.used_by?(cuttingFace)
 
           # 4.4.2 Check if the edge is less that 45 degress
-          next if edge.line[1].angle_between(Geom::Vector.new(0,0,0)) > Math::PI / 2
+
+          angle = edge.line[1].angle_between(Geom::Vector3d.new(0,0,0))
+
+          #puts "Edge Angle: #{angle}"
+          next if angle > Math::PI / 2
 
           # 4.4.3 Check if the edge is more that 135 degress
-          next if edge.line[1].angle_between(Geom::Vector.new(0,0,0)) < 3 * Math::PI / 4
+          next if angle < 3 * Math::PI / 4
 
           # 4.4.3 Generate cutting line from edge(vector) and outer vertex Lines[index]
 
@@ -181,6 +207,8 @@ module Main
             # 4.4.4.2 Generate cutting line from the vertex and vector from the edge
 
             # 4.4.4.3 Raytest: Outer vertex cutting line and cutting line from the vertices
+
+          end
 
         end
 
@@ -202,7 +230,13 @@ module Main
 
     end
 
+    t2 = Time.now
+
+    puts "Cutting strategy calculated! It took #{t2 - t1} seconds."
+
   end
+
+=begin
 
   def self.AnalyseCuttingFaces
 
@@ -247,6 +281,8 @@ module Main
 
   end
 
+=end
+
   def self.PathAlgorithm
 
     $faceArray.each do |face|
@@ -258,6 +294,7 @@ module Main
 
   end
 
+=begin
 
   def self.CalculateCuttingStrategy
 
@@ -287,6 +324,8 @@ module Main
 
   end
 
+=end
+
   def self.CalculateTrajectory
 
     puts "Calculating Trajectory..."
@@ -294,12 +333,6 @@ module Main
     # Calculate shortest path between vectors
 
     puts "Trajectory Calculated!"
-
-  end
-
-  def self.GenerateGCode
-
-    puts "Generating GCode..."
 
   end
 
@@ -341,15 +374,15 @@ module Main
 
   def self.UpdateExtensionOSX
 
-    puts "Updating modules. v1.0"
+    puts "Updating modules. v1.1"
 
     projectdir = File.dirname(__FILE__)
 
     load projectdir + "/settings.rb"
     load projectdir + "/analysemodel.rb"
     load projectdir + "/analysefaces.rb"
-    load projectdir + "/analysecuttingfaces.rb"
-    load projectdir + "/calculatecuttingstrategy.rb"
+    #load projectdir + "/analysecuttingfaces.rb"
+    load projectdir + "/calculatecuttingstrategyv2.rb"
 
     # puts projectdir
 
@@ -367,10 +400,10 @@ module Main
 
     menu.add_item('Analyse Model') {self.AnalyseModel}
     menu.add_item('Analyse Faces') {self.AnalyseFaces}
-    menu.add_item('Analyse Cutting Faces') {self.AnalyseCuttingFaces}
+    #menu.add_item('Analyse Cutting Faces') {self.AnalyseCuttingFaces}
     menu.add_item('Calculate Cutting Strategy') {self.CalculateCuttingStrategy}
     menu.add_item('Calculate Cutting Trajectory') {self.CalculateCuttingTrajectory}
-    menu.add_item('Generate GCode') {self.GenerateGCode}
+    #menu.add_item('Generate GCode') {self.GenerateGCode}
     menu.add_item('Export GCode') {self.ExportGCode}
     menu.add_item('Find points in faces') {self.PathAlgorithm}
 

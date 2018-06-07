@@ -39,12 +39,8 @@ module Main
   include CalculateCuttingStrategy
   include PathAlgorithm
 
-
-
   #include CalculateCuttingStrategy
   #include AnalyseCuttingFaces
-
-
 
   # Model and Layers
 
@@ -53,13 +49,18 @@ module Main
   $entities
   $layers
 
+  $originallayer
+  $cuttingtestlayer
+  $gcodelayer
+
+
+
   # Face Arrays
 
   $edgeArray = Array.new # Collect all edges
   $faceArray = Array.new # Keep track of found faces
   $cuttingArray = Array.new # Keep track of the faces to be cut
   $cuttingStrategy = Array.new # Keep track of cutting strategies
-
 
   $analysedArray = Array.new # Keep the CuttingFace class in array
   $cuttingStrategiesArray = Array.new # Keep track for the cutting strategies
@@ -84,6 +85,12 @@ module Main
     $model = Sketchup.active_model
     $entities = $model.active_entities
     $layers = $model.layers
+
+    # Layers
+    #$originallayer = $layers.layer
+    #$originallayer.name ="OriginalLayers"
+    $cuttingtestlayer = $layers.add("CuttingTestLayer")
+    $gcodelayer = $layers.add("GCodeLayer")
 
     # Clear faceArray and cuttingArray
     $faceArray.clear
@@ -117,7 +124,7 @@ module Main
       next if AnalyseFaces.TopBottom face
 
       # Check for faces with too many vertices
-      next if AnalyseFaces.TooManyVertices face
+      #next if AnalyseFaces.TooManyVertices face
 
       # Check if faces is too angled
       next if AnalyseFaces.TooAngled face
@@ -143,6 +150,16 @@ module Main
 
     t1 = Time.now
 
+    # Hide all edges...
+
+    puts "Hidding edges..." if $debugCalculateCuttingStrategy
+
+    $edgeArray.each do |edge|
+
+      edge.hidden = true
+
+    end
+
     $cuttingStrategy = Array.new
     $cuttingStrategy.clear
 
@@ -151,23 +168,41 @@ module Main
       # -- Cutting Strategy 1
 
       # 0. Create new face cutting strategy
-
       faceCuttingStrategy = FaceCuttingStrategy.new(cuttingFace)
+      $cuttingStrategy.push(faceCuttingStrategy)
 
+      # Calculate top and bottom vertices
       CalculateCuttingStrategy.TopBottomVertices faceCuttingStrategy
 
-      # 1. Find OuterVertices
+      # Calculate OuterVertices
       CalculateCuttingStrategy.OuterVertices faceCuttingStrategy
 
-      # 2. Generate cutting lines from outer vertices into Lines[0,1]
+      # Calculate cutting dirction vector
       vector = CalculateCuttingStrategy.UpVector(faceCuttingStrategy)
 
-      # 3. Raytest: Lines[0] & Line [i], if true, save and next face
-      CalculateCuttingStrategy.GenerateCuttingLine faceCuttingStrategy.outerVertices[0].position, vector
 
-      CalculateCuttingStrategy.GenerateCuttingLine faceCuttingStrategy.outerVertices[1].position, vector
+      # --- First Raytest ---
+      faceCuttingStrategy.rays[0] = CalculateCuttingStrategy.GenerateCuttingLine faceCuttingStrategy.outerVertices[0].position, vector
+      faceCuttingStrategy.rays[1] = CalculateCuttingStrategy.GenerateCuttingLine faceCuttingStrategy.outerVertices[1].position, vector
 
-      # --- Cutting Strategy 2
+      rayA = CalculateCuttingStrategy.RayTest faceCuttingStrategy.rays[0], faceCuttingStrategy.face
+      rayB = CalculateCuttingStrategy.RayTest faceCuttingStrategy.rays[1], faceCuttingStrategy.face
+
+      if !rayA && !rayB
+
+        faceCuttingStrategy.cuttable = true
+
+        puts "Strategy A is successful!" if $debugRaytest
+
+      else
+        puts "Strategy is not successful, proceding..." if $debugRaytest
+
+      end
+
+      next if !rayA && !rayB
+
+
+      # --- Second Raytest ---
 
       # 4. For each outer vertex
 
@@ -212,21 +247,36 @@ module Main
 
         end
 
-
-
-
-
         # 4.4 For other vertices not connected to the edge
-
-
 
       end
 
+      # --- Third Raytest: Viften
 
+      # --- Face cannot be cut
 
-      # --- Cutting Strategy 3 (Viften)
+      puts "Face cannot be cut!" if $debugCalculateCuttingStrategy
 
+      faceCuttingStrategy.face.material = "black"
+      faceCuttingStrategy.face.back_material = "black"
 
+    end
+
+    # Show all cutting rays
+
+    if $drawRaytest
+      $cuttingStrategy.each do |faceCuttingStrategy|
+
+        $entities.add_line faceCuttingStrategy.rays[0]
+        $entities.add_line faceCuttingStrategy.rays[1]
+
+      end
+    end
+
+    # Show all edges again...
+    $edgeArray.each do |edge|
+
+      edge.hidden = false
 
     end
 

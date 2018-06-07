@@ -53,6 +53,10 @@ module AnalyseModel
 
     array.each do |face|
 
+      # Set another
+
+      #face = #add_face(face.vertices)
+
       face.material = "green"
       face.back_material = "green"
 

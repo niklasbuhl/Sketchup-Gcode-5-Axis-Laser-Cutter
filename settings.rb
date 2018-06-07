@@ -12,3 +12,13 @@ $laserFocalPercent = 50 # % (0 = top, 100 = bottom of face)
 $tableWidth = 800.mm #(x-axis)
 $tableDepth = 400.mm #(y-axis)
 $tableHeight = 200.mm #(z-axis)
+
+
+# --- DEBUGGING
+
+$debugRaytest = false
+$debugCalculateCuttingStrategy = false
+
+# --- DRAWING
+
+$drawRaytest = true

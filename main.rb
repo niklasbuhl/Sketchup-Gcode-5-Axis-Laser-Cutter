@@ -5,9 +5,9 @@
   # UI.menu.add_item("G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/main.rb");}
 
 # Too add to Sketchup on Jesper
-
-  #     UI.menu.add_item("G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\main.rb");}
-
+=begin
+       UI.menu.add_item("G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\main.rb");}
+=end
 # Z is the up axis
 
 require 'sketchup'
@@ -31,7 +31,7 @@ module Main
   include AnalyseModel
   include AnalyseFaces
   include AnalyseCuttingFaces
-  include PathAlgorithm
+  include CalculateNodePair
   include CalculateCuttingStrategy
 
 
@@ -50,6 +50,12 @@ module Main
   $cuttingStrategiesArray = Array.new # Keep track for the cutting strategies
 
   # Primary Methods
+
+  # Path Algorithm variables
+
+  $nodes = Array.new()
+  $distance_sorted = Array.new()
+
 
   # ---
 
@@ -168,16 +174,42 @@ module Main
 
   end
 
-  def self.PathAlgorithm
+  def self.PathAlgorithmStart
 
-    $faceArray.each do |face|
-
-      PathAlgorithm.Findpoints face 
-    # make an array with the points of the found faces
+    puts "Calculate Path Version 0.2"
+   
+    CalculateNodePair.start
 
   
   end
-      
+     
+  def self.PathAlgorithmDraw
+
+    puts "Calculate Path Version 0.2"
+
+    CalculateNodePair.draw_lines
+
+  
+  end
+
+
+  def self.PathAlgorithmDist
+
+    puts "Calculate Path Version 0.2"
+
+    CalculateNodePair.distdetermin
+
+  
+  end
+
+  def self.PathAlgorithmOrderedDraw
+
+    puts "Calculate Path Version 0.2"
+
+    CalculateNodePair.draw_ordered_lines
+
+  
+  end
 
   def self.CalculateCuttingStrategy
 
@@ -269,7 +301,9 @@ module Main
     load projectdir + "/analysemodel.rb"
     load projectdir + "/analysefaces.rb"
     load projectdir + "/analysecuttingfaces.rb"
+    load projectdir + "/pathalgorithm.rb"
     load projectdir + "/calculatecuttingstrategy.rb"
+
 
     # puts projectdir
 
@@ -290,6 +324,13 @@ module Main
     menu.add_item('Analyse Cutting Faces') {self.AnalyseCuttingFaces}
     menu.add_item('Calculate Cutting Strategy') {self.CalculateCuttingStrategy}
     menu.add_item('Calculate Cutting Trajectory') {self.CalculateCuttingTrajectory}
+    
+    pathsubmenu = menu.add_submenu("Path Algorithm")
+    pathsubmenu.add_item('Load Test Data') {self.PathAlgorithmStart}
+    pathsubmenu.add_item('Draw Test Lines') {self.PathAlgorithmDraw}
+    pathsubmenu.add_item('Calculate Order') {self.PathAlgorithmDist}
+    pathsubmenu.add_item('Draw Ordered Lines') {self.PathAlgorithmOrderedDraw}
+    
     menu.add_item('Generate GCode') {self.GenerateGCode}
     menu.add_item('Export GCode') {self.ExportGCode}
     menu.add_item('Find points in faces') {self.PathAlgorithm}

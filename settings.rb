@@ -18,7 +18,12 @@ $tableHeight = 200.mm #(z-axis)
 
 $debugRaytest = false
 $debugCalculateCuttingStrategy = false
+$debugStrategy2 = false
+$debugStrategy3 = false
+$debugLaserCut = false
+$debugCalculateABangle = false
 
 # --- DRAWING
 
 $drawRaytest = true
+$drawLaserCut = true

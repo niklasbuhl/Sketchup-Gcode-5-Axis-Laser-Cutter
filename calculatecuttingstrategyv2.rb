@@ -27,24 +27,19 @@ class ManipulatedVertex
 end
 
 
-
-class ExtendedEdge
-
-end
-
-
 class FaceCuttingStrategy
 
-  attr_accessor :face, :rays, :cuttable, :laserStart, :laserEnd, :laserStartPosition, :laserStartOrientation, :laserEndPosition, :laserEndOrientation, :topVertex, :bottomVertex, :outerVertices, :vertexCount, :manipulatedVertices
+  attr_accessor :face, :rays, :cuttable, :strategy, :laserStart, :laserEnd, :laserStartPosition, :laserStartOrientation, :laserEndPosition, :laserEndOrientation, :topVertex, :bottomVertex, :outerVertices, :vertexCount, :manipulatedVertices
 
   def initialize face
 
     # Reference to the visual face
     @face = face
 
-    
+    # Laser Cutting Rays [Point3d, Point3d]
     @rays = Array.new()
     @cuttable = false
+    @strategy = ""
 
     #puts "Face: #{@face.to_s}"
     #puts "Face-type: #{$face.typename}"
@@ -183,7 +178,7 @@ module CalculateCuttingStrategy
     # puts ""
 
     # Take the length of these vector and sort them, including the origin which is zero
-    faceCuttingStrategy.manipulatedVertices.sort! { |x,y| x.projectedValue <=> y.projectedValue }
+    faceCuttingStrategy.manipulatedVertices.sort! { |xP,yP| xP.projectedValue <=> yP.projectedValue }
 
     # faceCuttingStrategy.manipulatedVertices.each { |i| puts "Projected Value: #{i.projectedValue}"}
 
@@ -486,6 +481,70 @@ module CalculateCuttingStrategy
     pointB = point + vector.to_a
 
     entities.add_line pointA, pointB
+
+  end
+
+  def self.LaserCut faceCuttingStrategy
+
+    # Find the z-value based top-point, bottom-point and percentage.
+    # 0% being the top, 100% being the bottom.
+
+    topZ = faceCuttingStrategy.topVertex.position.z
+    bottomZ = faceCuttingStrategy.bottomVertex.position.z
+
+    z = topZ - bottomZ
+
+    # Vector z-value
+    z = (z / 100) * (100 - $laserFocalPercent)
+
+    puts "z: #{z}" if $debugLaserCut
+
+    vectorA = Geom::Vector3d.new(faceCuttingStrategy.rays[0][0] - faceCuttingStrategy.rays[0][1])
+    vectorB = Geom::Vector3d.new(faceCuttingStrategy.rays[1][0] - faceCuttingStrategy.rays[1][1])
+
+    bottomRayA = ExtendVector vectorA, "z", z
+    bottomRayB = ExtendVector vectorB, "z", z
+
+    topRayA = ScaleVector vectorA.normalize, $laserFocalPoint
+    topRayB = ScaleVector vectorB.normalize, $laserFocalPoint
+
+    #topRayA = ExtendVector vectorA, "z", $laserFocalPoint
+    #topRayB = ExtendVector vectorB, "z", $laserFocalPoint
+
+    faceCuttingStrategy.laserStartPosition = faceCuttingStrategy.rays[0][1] + bottomRayA + topRayA
+    faceCuttingStrategy.laserEndPosition = faceCuttingStrategy.rays[1][1] + bottomRayB + topRayB
+
+  end
+
+  def self.CalculateOrientation faceCuttingStrategy
+
+    vectorA = Geom::Vector3d.new(faceCuttingStrategy.rays[0][0] - faceCuttingStrategy.rays[0][1])
+    vectorB = Geom::Vector3d.new(faceCuttingStrategy.rays[1][0] - faceCuttingStrategy.rays[1][1])
+
+    CalculateABangle vectorA
+    CalculateABangle vectorB
+
+  end
+
+  def self.CalculateABangle vector
+
+    zVector = Geom::Vector3d.new(0,0,1)
+
+    xzVector = Geom::Vector3d.new(vector.x,0,vector.z)
+
+    yzVector = Geom::Vector3d.new(0,vector.y,vector.z)
+
+    a = zVector.angle_between(xzVector)
+
+    b = zVector.angle_between(yzVector)
+
+    a = a * (180 / Math::PI)
+
+    b = b * (180 / Math::PI)
+
+    puts "Angle [a]: #{a}, angle [b]: #{b}" if $debugCalculateABangle
+
+    return a, b
 
   end
 

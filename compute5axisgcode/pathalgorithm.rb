@@ -117,8 +117,8 @@ module CalculateTrajectory
     gcode.string << "A#{(gcode.a)}\t"
     gcode.string << "B#{(gcode.b)}\t"
 
-    gcode.string << "F150" if gcode.gcode = 1
-    gcode.string << "F400" if gcode.gcode = 0
+    gcode.string << "F150" if gcode.gcode == 1
+    gcode.string << "F400" if gcode.gcode == 0
 
     #gcode.string << "F#{(gcode.feedrate)}" # Removed tab
     #gcode.string << "P#{(gcode.power)}"

@@ -81,6 +81,35 @@ end
 
 module CalculateCuttingStrategy
 
+  def self.ClearCutRay
+
+    puts "Clearing Cuts and Ray Arrays and Edges v0.3" if $debugClearCutRayArray
+
+    $laserCutArray.each do |cut|
+
+      next if cut.nil?
+
+      next if cut.deleted?
+
+      cut.erase! if cut.is_a? (Sketchup::Edge)
+
+    end
+
+    $laserRayArray.each do |ray|
+
+      next if ray.nil?
+
+      next if ray.deleted?
+
+      ray.erase! if ray.is_a? (Sketchup::Edge)
+
+    end
+
+    $laserCutArray.clear
+    $laserRayArray.clear
+
+  end
+
   def self.TopBottomVertices faceCuttingStrategy
 
     # Sort the vertices in the cutting face for high-< to low-z
@@ -237,6 +266,201 @@ module CalculateCuttingStrategy
     # Direction vector
 
     return [topPoint, bottomPoint]
+
+  end
+
+  def self.FirstStrategy faceCuttingStrategy, cutting_index
+
+    # Calculate cutting dirction vector
+    vector = UpVector(faceCuttingStrategy)
+
+    # Get the position of the outer vertices
+    pointA = faceCuttingStrategy.outerVertices[0].position
+    pointB = faceCuttingStrategy.outerVertices[1].position
+
+    # --- First Raytest ---
+    faceCuttingStrategy.rays[0] = CalculateCuttingStrategy.GenerateCuttingLine pointA, vector
+    faceCuttingStrategy.rays[1] = CalculateCuttingStrategy.GenerateCuttingLine pointB, vector
+
+    rayA = CalculateCuttingStrategy.RayTest faceCuttingStrategy.rays[0], faceCuttingStrategy.face
+    rayB = CalculateCuttingStrategy.RayTest faceCuttingStrategy.rays[1], faceCuttingStrategy.face
+
+    # Successful strategy 1
+    if !rayA & !rayB
+
+      faceCuttingStrategy.cuttable = true
+      faceCuttingStrategy.strategy = "1"
+      puts "Face #{cutting_index}. Strategy 1 is successful!" if $debugStrategy1
+      return true
+
+    end
+
+    puts "Face #{cutting_index}. Strategy 1 is not successful, proceding..." if $debugStrategy1
+
+    return false
+
+  end
+
+  def self.SecondStrategy faceCuttingStrategy, cutting_index
+
+    rayA = nil
+    rayB = nil
+    vector = nil
+
+    # For each outer vertex
+    faceCuttingStrategy.outerVertices.each_with_index do |outerVertex, vertex_index|
+
+      # Find cuttable edge from outerVertex
+
+      edges = outerVertex.edges
+      puts "Listing edges: #{edges}" if $debugStrategy2
+
+      # For each edge connected to the outerVertices
+      edges.each do |edge|
+
+        #puts "This is: #{edge}" if $debugStrategy2
+
+        # Check if the edge is on the face
+        next unless edge.used_by?(faceCuttingStrategy.face)
+
+        # Calculate the angle of the edge
+        angle = edge.line[1].angle_between(Geom::Vector3d.new(0,0,1))
+
+        puts "Edge Angle: #{angle * (180 / Math::PI) }. Less than: #{ (Math::PI / 4) * (180 / Math::PI) } or higher then: #{ 3 * Math::PI / 4 * (180 / Math::PI) }" if $debugStrategy2
+
+        # Check if the edge is more that 45 degress and less than 135
+        next if angle > Math::PI / 4 && angle < 3 * Math::PI / 4
+
+        # Check if the edge is less that 135 degress
+        #next unless angle > 3 * Math::PI / 4 && angle > Math::PI / 4
+
+        puts "Angle is alright" if $debugStrategy2
+
+        # Get the vector from the edge
+        vector = edge.line[1] # Vector from the edge
+
+        puts "Vector of line: #{vector.to_s}" if $debugStrategy2
+
+        break
+
+      end
+
+      # Get point and vector for cutting line
+      pointA = outerVertex.position # position from outerVertex
+
+      # Generate cutting line from edge(vector) and outer vertex
+
+      faceCuttingStrategy.rays[vertex_index] = CalculateCuttingStrategy.GenerateCuttingLine pointA, vector
+
+      # Raytest
+      rayA = CalculateCuttingStrategy.RayTest faceCuttingStrategy.rays[vertex_index], faceCuttingStrategy.face
+
+      $entities.add_line(faceCuttingStrategy.rays[vertex_index]) if $debugStrategy2rays
+
+      # If this ray did not succeed
+      if rayA
+
+        puts "Face #{cutting_index}. Stragety 2.#{vertex_index}a was not successful, proceeding..." if $debugStrategy2
+        next
+
+      end
+
+      # Find the vertice furthest away
+      faceCuttingStrategy.manipulatedVertices.each do |manipulatedVertex|
+
+        manipulatedVertex.projectedValue = manipulatedVertex.origVertex.position.distance_to_line(pointA, vector)
+
+      end
+
+      # Sort manipulatedVertex array to the projectedValue(distance(), Take the distances and sort them, including the origin which is zero
+      faceCuttingStrategy.manipulatedVertices.sort! { |x,y| x.projectedValue <=> y.projectedValue }
+
+      if $debugStrategy2
+
+        #faceCuttingStrategy.manipulatedVertices.each { |manipulatedVertex| puts "All: #{manipulatedVertex.projectedValue}"}
+        #puts "Highest: #{faceCuttingStrategy.manipulatedVertices.last.projectedValue}"
+
+      end
+
+      pointB = faceCuttingStrategy.manipulatedVertices.last.origVertex.position
+
+      # Generate cutting line from the vertex and vector from the first edge
+
+      tempRayB = CalculateCuttingStrategy.GenerateCuttingLine pointB, vector
+
+      #faceCuttingStrategy.rays[1-vertex_index] = CalculateCuttingStrategy.GenerateCuttingLine pointB, vector
+
+      # Raytest: Outer vertex cutting line and cutting line from the vertices
+      rayB = CalculateCuttingStrategy.RayTest tempRayB, faceCuttingStrategy.face
+
+      $entities.add_line(faceCuttingStrategy.rays[1-vertex_index]) if $debugStrategy2rays
+
+      # Second ray test successful, break the loop for each
+      if !rayA && !rayB
+
+        faceCuttingStrategy.cuttable = true
+        faceCuttingStrategy.rays[1-vertex_index] = tempRayB
+        faceCuttingStrategy.strategy = "2.#{vertex_index}"
+
+        puts "Face #{cutting_index}. Strategy 2.#{vertex_index} was successful!" if $debugStrategy2
+
+        puts "Breaking loop." if $debugStrategy2
+
+        return true
+
+      end
+
+      puts "Face #{cutting_index}. Strategy 2.#{vertex_index}b was not successful, proceeding..." if $debugStrategy2
+
+    end
+
+    return false
+
+
+
+=begin
+
+    # Second ray test successful
+    if !rayA && !rayB
+      puts "Next (debugStrategy2)" if $debugStrategy2
+      next
+    end
+
+=end
+
+  end
+
+  def self.ThirdStrategy faceCuttingStrategy, cutting_index
+
+    # As they are already saved from above they should just be checked.
+
+    puts "Trying third strategy"
+
+    rayA = CalculateCuttingStrategy.RayTest faceCuttingStrategy.rays[0], faceCuttingStrategy.face
+    $entities.add_line(faceCuttingStrategy.rays[0]) if $debugStrategy3rays
+    puts "RayA was successful" if !rayA && $debugStrategy3
+
+    rayB = CalculateCuttingStrategy.RayTest faceCuttingStrategy.rays[1], faceCuttingStrategy.face
+    $entities.add_line(faceCuttingStrategy.rays[1]) if $debugStrategy3rays
+    puts "RayB was successful" if !rayB && $debugStrategy3
+
+    # If they did not hit anything, proceed to next cuttingFace
+    if !rayA && !rayB
+
+      faceCuttingStrategy.cuttable = true
+      faceCuttingStrategy.strategy = "3"
+
+      puts "Face #{cutting_index}. Strategy 3 was successful!"
+
+      # Success!
+      return true
+
+    end
+
+    puts "Face #{cutting_index}. Strategy 3 was not successful, proceeding..."
+
+    # Failed!
+    return false
 
   end
 
@@ -502,11 +726,22 @@ module CalculateCuttingStrategy
     vectorA = Geom::Vector3d.new(faceCuttingStrategy.rays[0][0] - faceCuttingStrategy.rays[0][1])
     vectorB = Geom::Vector3d.new(faceCuttingStrategy.rays[1][0] - faceCuttingStrategy.rays[1][1])
 
-    bottomRayA = ExtendVector vectorA, "z", z
-    bottomRayB = ExtendVector vectorB, "z", z
+    unless z == 0
+      bottomRayA = ExtendVector vectorA, "z", z
+      bottomRayB = ExtendVector vectorB, "z", z
+    else
+      bottomRayA = bottomRayB = Geom::Vector3d.new(0,0,0)
+    end
 
     topRayA = ScaleVector vectorA.normalize, $laserFocalPoint
     topRayB = ScaleVector vectorB.normalize, $laserFocalPoint
+
+    if $testPrintingWithoutZaxis
+
+      topRayA = ExtendVector topRayA, "z", $laserFocalPoint
+      topRayB = ExtendVector topRayB, "z", $laserFocalPoint
+
+    end
 
     #topRayA = ExtendVector vectorA, "z", $laserFocalPoint
     #topRayB = ExtendVector vectorB, "z", $laserFocalPoint
@@ -521,28 +756,45 @@ module CalculateCuttingStrategy
     vectorA = Geom::Vector3d.new(faceCuttingStrategy.rays[0][0] - faceCuttingStrategy.rays[0][1])
     vectorB = Geom::Vector3d.new(faceCuttingStrategy.rays[1][0] - faceCuttingStrategy.rays[1][1])
 
-    CalculateABangle vectorA
-    CalculateABangle vectorB
+    faceCuttingStrategy.laserStartOrientation = CalculateABangle vectorA
+    faceCuttingStrategy.laserEndOrientation = CalculateABangle vectorB
 
   end
 
   def self.CalculateABangle vector
 
+    # Make sure the z-value of the vector is positive.
+    vector = vector.reverse if vector.z < 0
+
+    # Create the reference z-vector
     zVector = Geom::Vector3d.new(0,0,1)
 
+    # Project the vector to XZ plane.
     xzVector = Geom::Vector3d.new(vector.x,0,vector.z)
 
+    # Project the vector to YZ plane.
     yzVector = Geom::Vector3d.new(0,vector.y,vector.z)
 
-    a = zVector.angle_between(xzVector)
+    # Angle between two 3d vectors, always positive.
+    a = zVector.angle_between(yzVector)
+    b = zVector.angle_between(xzVector)
 
-    b = zVector.angle_between(yzVector)
+    # Since the function always returns a positive angle between the vectors, depending on the vector orienation is must be inverted.
+    a = a * (-1) if vector.y > 0
+    b = b * (-1) if vector.x < 0
 
+    # Convert radians to degrees
     a = a * (180 / Math::PI)
-
     b = b * (180 / Math::PI)
 
+    # Round
+    a = a.round($gcodeAngleDecimals)
+    b = b.round($gcodeAngleDecimals)
+
+    puts "Vector [x]: #{vector.x}, [y]: #{vector.y}, [z]: #{vector.z}" if $debugCalculateABangle
     puts "Angle [a]: #{a}, angle [b]: #{b}" if $debugCalculateABangle
+
+    puts "Vector [x]: #{vector.x}, [y]: #{vector.y}, [z]: #{vector.z}, Angle [a]: #{a}, angle [b]: #{b}" if $debugViften
 
     return a, b
 

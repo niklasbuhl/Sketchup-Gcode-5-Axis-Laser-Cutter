@@ -117,8 +117,21 @@ module CalculateTrajectory
     gcode.string << "A#{(gcode.a)}\t"
     gcode.string << "B#{(gcode.b)}\t"
 
-    gcode.string << "F150" if gcode.gcode == 1
-    gcode.string << "F400" if gcode.gcode == 0
+    gcode.string << "F#{$laserCuttingFeedrate}" if gcode.gcode == 1
+
+    if gcode.gcode == 0
+
+      if gcode.z != 0
+
+        gcode.string << "F#{$laserZFeedrateLimit}"
+
+      else
+
+        gcode.string << "F#{$laserFeedrate}"
+
+      end
+
+    end
 
     #gcode.string << "F#{(gcode.feedrate)}" # Removed tab
     #gcode.string << "P#{(gcode.power)}"

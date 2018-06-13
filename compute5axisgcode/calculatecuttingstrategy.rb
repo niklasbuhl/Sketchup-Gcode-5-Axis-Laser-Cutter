@@ -646,12 +646,6 @@ module CalculateCuttingStrategy
 
   end
 
-  def self.PlaneTest lineA, lineB
-
-    # Create a plane and check if it not hitting anything.
-
-  end
-
   def self.ProjectVector vectorA, vectorB
 
     #puts "Projecting Vector A: #{vectorA.to_s} onto Vector B: #{vectorB.to_s}"

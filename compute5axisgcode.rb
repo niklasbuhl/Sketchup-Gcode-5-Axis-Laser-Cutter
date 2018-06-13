@@ -4,11 +4,11 @@
 
 # Too add to Sketchup on Niklas
 
-  UI.menu.add_item("G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/compute5axisgcode.rb");}
+  UI.menu.add_item("0. G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/compute5axisgcode.rb");}
 
 # Too add to Sketchup on Jesper
 
-UI.menu.add_item("G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\compute5axisgcode/.rb");}
+UI.menu.add_item("0. G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\compute5axisgcode/.rb");}
 
 # Test to add to Jacob Lawaetz
 
@@ -87,7 +87,7 @@ module Main
 
   def self.AnalyseModel
 
-    puts "Analysing model v1.0"
+    puts "Analysing model v1.1"
 
     t1 = Time.now
 
@@ -154,7 +154,7 @@ module Main
 
     end
 
-    puts "Analysing faces v1.0"
+    puts "Analysing faces v1.2"
 
     t1 = Time.now
 
@@ -194,7 +194,7 @@ module Main
 
     end
 
-    puts "Calculating cutting faces v1.0"
+    puts "Calculating cutting faces v1.7"
 
     t1 = Time.now
 
@@ -340,7 +340,7 @@ module Main
 
     end
 
-    puts "Calculating Trajectory v0.2"
+    puts "Calculating Trajectory v2.2"
 
     t1 = Time.now
 
@@ -500,21 +500,23 @@ module Main
 
     menu = UI.menu('Plugins')
 
-    menu.add_item('Analyse Model') {self.AnalyseModel}
-    menu.add_item('Analyse Faces') {self.AnalyseFaces}
+    menu.add_item('1. Analyse Model') {self.AnalyseModel}
+    menu.add_item('2. Analyse Faces') {self.AnalyseFaces}
     #menu.add_item('Analyse Cutting Faces') {self.AnalyseCuttingFaces}
-    menu.add_item('Calculate Cutting Strategy') {self.CalculateCuttingStrategy}
-    menu.add_item('Calculate Trajectory') {self.CalculateTrajectory}
+    menu.add_item('3. Calculate Cutting Strategy') {self.CalculateCuttingStrategy}
+    menu.add_item('4. Calculate Trajectory') {self.CalculateTrajectory}
     #menu.add_item('Generate GCode') {self.GenerateGCode}
-    menu.add_item('Export GCode') {self.ExportGCode}
+    menu.add_item('5. Export GCode') {self.ExportGCode}
     #menu.add_item('Find points in faces') {self.PathAlgorithm}
+
+    # Sub Menu with Developing Tools
 
     # Remove everything and generate test models (Used for development purposes)
     menu.add_item('Generate Test Models') {self.GenerateTestModels}
-    menu.add_item('Generate Simple Test Model') {self.GenerateSimpleTestModel}
+    #menu.add_item('Generate Simple Test Model') {self.GenerateSimpleTestModel}
 
     # To remove extension (Used for development purposes)
-    menu.add_item('Update Extension') {self.UpdateExtension}
+    menu.add_item('Developer: Update Extension') {self.UpdateExtension}
 
     file_loaded(__FILE__)
 

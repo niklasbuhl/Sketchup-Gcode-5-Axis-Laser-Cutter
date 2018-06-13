@@ -6,7 +6,13 @@
 
 $laserFocalPoint = 167.mm # away from head
 $laserFocalPercent = 100 # % (0 = top, 100 = bottom of face)
-$laserFeedrate = 400
+
+# --- MACHINE LIMITATIONS ---
+
+$laserFeedrate = 800
+$laserCuttingFeedrate = 150
+$laserZFeedrateLimit = 400
+
 $laserIntensity = 1
 
 
@@ -23,7 +29,7 @@ $laserStartX = 0.mm
 $laserStartY = 0.mm
 $laserStartZ = 167.mm
 
-# --- GCODE ---
+# --- INVERTING AXES ---
 
 # Around X-axis
 $invertAngleA = false

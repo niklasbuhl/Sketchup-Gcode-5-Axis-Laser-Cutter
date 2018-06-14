@@ -1,41 +1,35 @@
 =begin
 
-# Project by Jesper Kirial and Niklas Buhl
+Updated: 14th June 2018
 
-# Too add to Sketchup on Niklas
+# --- SketchUp Extension by ---
 
-  UI.menu.add_item("0. G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/compute5axisgcode.rb");}
+Jesper Nagel Kirial
+Niklas Buhl - https://niklasbuhl.xyz
 
-# Too add to Sketchup on Jesper
+Developed in the relation to a special course at Technical University of Denmark
 
-UI.menu.add_item("0. G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\compute5axisgcode/.rb");}
+Supervisers:
+Bjørn Klink Christensen
+Jacob Lawaetz
 
-# Test to add to Jacob Lawaetz
+# --- Description ---
 
-UI.menu.add_item("G-Code") {
+# --- More Information ---
 
+Link to report
 
-
-  load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\compute5axisgcode/.rb")
-
-}
-
-
-# Z is the up axis
+http://www.diplom.dtu.dk/5axislaser
 
 =end
 
 require 'sketchup'
-# require 'os' # https://rubygems.org/gems/os // How to add it into the Skethcup path
 
 require_relative 'compute5axisgcode/analysemodel.rb'
 require_relative 'compute5axisgcode/analysefaces.rb'
-#require_relative 'analysecuttingfaces'
-#require_relative 'calculatecuttingstrategy'
 require_relative 'compute5axisgcode/calculatecuttingstrategy.rb'
-require_relative 'compute5axisgcode/exportgcode.rb'
+require_relative 'compute5axisgcode/calculatetrajectory.rb'
 require_relative 'compute5axisgcode/settings.rb'
-require_relative 'compute5axisgcode/pathalgorithm.rb'
 
 module Main
 
@@ -48,7 +42,6 @@ module Main
   include AnalyseFaces
   include CalculateCuttingStrategy
   include CalculateTrajectory
-  include ExportGCode
 
   # Model
   $model = Sketchup.active_model
@@ -79,12 +72,6 @@ module Main
 
   # ---
 
-  def self.main_method
-
-    puts "Hello Main Method"
-
-  end
-
   def self.AnalyseModel
 
     puts "Analysing model v1.1"
@@ -94,19 +81,11 @@ module Main
     # Updating all sketchup entities
     $model = Sketchup.active_model
     $entities = $model.active_entities
-    #$layers = $model.layers
 
-    # Layers
-    #$originallayer = $layers.layer
-    #$originallayer.name ="OriginalLayers"
-    #$cuttingtestlayer = $layers.add("CuttingTestLayer")
-    #$gcodelayer = $layers.add("GCodeLayer")
-
-    # Clear faceArray and cuttingArray
+    # Clear arrays
     $faceArray.clear
     $edgeArray.clear
     $vertexArray.clear
-
     $cuttingArray.clear
     $cuttingStrategy.clear
 
@@ -114,7 +93,7 @@ module Main
     CalculateCuttingStrategy.ClearCutRay
 
     # Explode Model!
-    AnalyseModel.Explode $model.entities
+    AnalyseModel.ExplodeModel $model.entities
 
     # Find faces in the model
     AnalyseModel.FindFaces $model.entities
@@ -134,7 +113,7 @@ module Main
 
     AnalyseModel.CheckBoundaries $vertexArray
 
-    # If there are vertices out of bound return with error
+    # [FUTURE WORK] If there are vertices out of bound return with error
 
     $programState = 1
 
@@ -148,7 +127,7 @@ module Main
 
     unless $programState == 1
 
-      # Give a waring to analyse model
+      # [FUTURE WORK] Give a waring to analyse model
 
       return
 
@@ -188,7 +167,7 @@ module Main
 
     unless $programState == 2
 
-      # Give a waring to analyse faces
+      # [FUTURE WORK] Give a waring to analyse faces
 
       return
 
@@ -198,10 +177,9 @@ module Main
 
     t1 = Time.now
 
-    # Hide all edges, so raytest does not cause unessacary trouble
-
     puts "Hidding all edges..." if $debugCalculateCuttingStrategy
 
+    # Hide all edges, so raytest does not cause unessacary trouble
     $edgeArray.each do |edge|
 
       edge.hidden = true
@@ -252,13 +230,18 @@ module Main
       faceCuttingStrategy.face.material = "black"
       faceCuttingStrategy.face.back_material = "black"
 
+      # [FUTURE WORK] Remove from array again if it cannot be cut...
+
     end
 
-    # Calculate Actual Laser Positions and Orientations
+    # --- Calculate Actual Laser Positions and Orientations ---
 
     $cuttingStrategy.each do |faceCuttingStrategy|
 
+      # Calculate the vectors for the entry and exit rays
       CalculateCuttingStrategy.LaserCut faceCuttingStrategy
+
+      # Calculate the angles A and B for entry and exit ray
       CalculateCuttingStrategy.CalculateOrientation faceCuttingStrategy
 
     end
@@ -273,11 +256,12 @@ module Main
 
         puts "#{faceCuttingStrategy.strategy}" if $debugCalculateCuttingStrategy
 
-        # If the face cannot be cut, proceed.
+        # If the face cannot be cut, proceed
         if faceCuttingStrategy.cuttable != true
 
-          $entities.add_line(faceCuttingStrategy.rays[0])
-          #$entities.add_line(faceCuttingStrategy.rays[1])
+          # Shows the rays of the face cutting strategy that did not succeed
+          $laserRayArray.push($entities.add_line(faceCuttingStrategy.rays[0]))
+          $laserRayArray.push($entities.add_line(faceCuttingStrategy.rays[1]))
 
           puts "Wrong cutting strategy: #{faceCuttingStrategy.strategy}"  if $debugCalculateCuttingStrategy
 
@@ -296,7 +280,7 @@ module Main
 
     end
 
-    # Show all cutting rays
+    # Show all cutting rays, disabled by default
 
     if $drawRaytest
       $cuttingStrategy.each_with_index do |faceCuttingStrategy, strategy_index|
@@ -309,8 +293,6 @@ module Main
         # Add lines
         $laserRayArray.push($entities.add_line faceCuttingStrategy.rays[0])
         $laserRayArray.push($entities.add_line faceCuttingStrategy.rays[1])
-
-        #puts "Ray[0]: #{faceCuttingStrategy.rays[0].to_s}, Ray[1]: #{faceCuttingStrategy.rays[1].to_s}" if $debugLaserCut
 
       end
     end
@@ -334,7 +316,7 @@ module Main
 
     unless $programState == 3
 
-      # Give a waring to calculate cutting strategies
+      # [FUTURE WORK] Give a waring to calculate cutting strategies
 
       return
 
@@ -362,14 +344,10 @@ module Main
     $gcodeArray.each do |gcode|
 
       # Calculate relative path from absolute points and orienations
-      unless CalculateTrajectory.RelativeGCodeRelativeXYZ gcode
+      # Next if the relative GCode G0/G1 is 0,0,0,0,0 (No cut or movement)
+      next unless CalculateTrajectory.RelativeGCodeRelativeXYZ gcode
 
-        # Need to create some function to delete this element if it's 0,0,0,0,0
-
-        next
-
-      end
-
+      # Write the G0 X1 Y2... string
       CalculateTrajectory.WriteGCodeString gcode
 
     end
@@ -389,7 +367,7 @@ module Main
 
     unless $programState == 4
 
-      # Give a waring to calculate trajectory
+      # [FUTURE WORK] Give a waring to calculate trajectory
 
       return
 
@@ -399,14 +377,17 @@ module Main
 
     t1 = Time.now
 
+    # Set filepath to nil so if the save panel is cancelled it simply gives an error
     filepath_filename = nil
 
+    # Open the save panel to select destination and name for the gcode file
     filepath_filename = UI.savepanel("Save GCode File", "", "gcodes.gcode")
 
     puts "#{filepath_filename}" if $debugExportGCode
 
     puts "#{$gcodeArray.size} lines of instructions." if $debugExportGCode
 
+    # Save panel is stopped or cancelled
     if filepath_filename == nil
 
       t2 = Time.now
@@ -459,34 +440,19 @@ module Main
 
   end
 
-  def self.GenerateSimpleTestModel
-
-    puts "Generate Simple Test Model. v0.1"
-
-    model = Sketchup.active_model
-
-    testModelPath = File.join(File.dirname(__FILE__),'/compute5axisgcode/testmodels/test-simplemodel.skp')
-
-    model.import(testModelPath)
-
-  end
-
   def self.UpdateExtension
+
+    # Function to update the modules, classes and functions without having to restart SketchUp
 
     puts "Updating modules. v2.1"
 
     projectdir = File.dirname(__FILE__)
 
-    load projectdir + "/compute5axisgcode/settings.rb"
     load projectdir + "/compute5axisgcode/analysemodel.rb"
     load projectdir + "/compute5axisgcode/analysefaces.rb"
     load projectdir + "/compute5axisgcode/calculatecuttingstrategy.rb"
-    load projectdir + "/compute5axisgcode/pathalgorithm.rb"
-    load projectdir + "/compute5axisgcode/exportgcode.rb"
-    #load projectdir + "/analysecuttingfaces.rb"
-
-
-    # puts projectdir
+    load projectdir + "/compute5axisgcode/calculatetrajectory.rb"
+    load projectdir + "/compute5axisgcode/settings.rb"
 
   end
 
@@ -496,24 +462,21 @@ module Main
 
   # ---
 
+  # Only loads them the first time
   unless file_loaded?(__FILE__)
 
     menu = UI.menu('Plugins')
 
     menu.add_item('1. Analyse Model') {self.AnalyseModel}
     menu.add_item('2. Analyse Faces') {self.AnalyseFaces}
-    #menu.add_item('Analyse Cutting Faces') {self.AnalyseCuttingFaces}
     menu.add_item('3. Calculate Cutting Strategy') {self.CalculateCuttingStrategy}
     menu.add_item('4. Calculate Trajectory') {self.CalculateTrajectory}
-    #menu.add_item('Generate GCode') {self.GenerateGCode}
     menu.add_item('5. Export GCode') {self.ExportGCode}
-    #menu.add_item('Find points in faces') {self.PathAlgorithm}
 
     # Sub Menu with Developing Tools
 
     # Remove everything and generate test models (Used for development purposes)
     menu.add_item('Generate Test Models') {self.GenerateTestModels}
-    #menu.add_item('Generate Simple Test Model') {self.GenerateSimpleTestModel}
 
     # To remove extension (Used for development purposes)
     menu.add_item('Developer: Update Extension') {self.UpdateExtension}

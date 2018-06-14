@@ -2,7 +2,9 @@
 
 class GCode
 
-  attr_accessor :point1, :point2, :orientation1, :orientation2, :placed, :start_point, :gcode, :x, :y, :z, :a, :b, :feedrate, :power, :distance, :string
+  # The GCode class to keep track of absolute,relative positions and orientations
+
+  attr_accessor :point1, :point2, :orientation1, :orientation2, :placed, :gcode, :x, :y, :z, :a, :b, :feedrate, :power, :distance, :string
 
   def initialize(point1, point2, orientation1, orientation2, gcode)
     #def initialize(point1, point2, gcode, orientation1, orientation2)
@@ -17,11 +19,12 @@ class GCode
     @a = 0
     @b = 0
 
+    # Distance is a value used to sort the gcodes in order of distance to some point
     @distance = 0
-    @start_point = 1
 
-    @feedrate = $laserFeedrate
-    @power = $laserIntensity
+    # Feed rate to the stepper motors
+    @feedrate = 0
+    @power = 0
 
     @string = nil
 
@@ -34,6 +37,8 @@ end
 module CalculateTrajectory
 
   def self.DrawGCodes
+
+    # Draw the gcodes
 
     puts "Drawing #{$gcodeArray.size} GCodes." if $debugGCode
 
@@ -54,10 +59,7 @@ module CalculateTrajectory
     puts "Point1: #{gcode.point1}" if $debugGCodeRelative
     puts "Point2: #{gcode.point2}" if $debugGCodeRelative
 
-    #gcode.x = (gcode.point2.x * (-1)  - gcode.point1.x * (-1) )
-    #gcode.y = (gcode.point2.y * (-1)  - gcode.point1.y * (-1) )
-    #gcode.z = (gcode.point2.z * (-1)  - gcode.point1.z * (-1) )
-
+    # Calculate the relative movement
     gcode.x = gcode.point2.x  - gcode.point1.x
     gcode.y = gcode.point2.y  - gcode.point1.y
     gcode.z = gcode.point2.z  - gcode.point1.z
@@ -65,14 +67,11 @@ module CalculateTrajectory
     puts "OrienationCalc: #{gcode.orientation1[0]} - #{gcode.orientation2[0]}" if $debugGCodeAngle
     puts "OrienationCalc: #{gcode.orientation1[1]} - #{gcode.orientation2[1]}" if $debugGCodeAngle
 
-
-    # Maybe reserving will do the trick
-    #gcode.a = (gcode.orientation1[0] * (-1) - gcode.orientation2[0] * (-1))
-    #gcode.b = (gcode.orientation1[1] * (-1) - gcode.orientation2[1] * (-1))
-
+    # Calculate the relative angle movement
     gcode.a = gcode.orientation1[0] - gcode.orientation2[0]
     gcode.b = gcode.orientation1[1] - gcode.orientation2[1]
 
+    # Invert depending on the machine config
     gcode.a = gcode.a * (-1) if $invertAngleA
     gcode.b = gcode.b * (-1) if $invertAngleB
 
@@ -89,6 +88,7 @@ module CalculateTrajectory
     gcode.y = gcode.y.to_f
     gcode.z = gcode.z.to_f
 
+    # Save the relative in the gcode and in a variable
     x = gcode.x = gcode.x.round($gcodeDecimals)
     y = gcode.y = gcode.y.round($gcodeDecimals)
     z = gcode.z = gcode.z.round($gcodeDecimals)
@@ -96,6 +96,7 @@ module CalculateTrajectory
     a = gcode.a = gcode.a.round($gcodeDecimals)
     b = gcode.b = gcode.b.round($gcodeDecimals)
 
+    # If there is no movement, i.e. 0,0,0,0,0 then discard the gcode
     return false if x == 0 && y == 0 && z == 0 && a == 0 && b == 0
 
     puts "Relative GCode: #{gcode.x}, #{gcode.y}, #{gcode.z}" if $debugGCodeRelative
@@ -117,24 +118,26 @@ module CalculateTrajectory
     gcode.string << "A#{(gcode.a)}\t"
     gcode.string << "B#{(gcode.b)}\t"
 
+    # The feedrate depends on many mechanical factors
+
+    # If the machine is cutting, then it has to go slow
     gcode.string << "F#{$laserCuttingFeedrate}" if gcode.gcode == 1
 
     if gcode.gcode == 0
 
       if gcode.z != 0
 
+        # If the movement is not moving in z-axis
         gcode.string << "F#{$laserZFeedrateLimit}"
 
       else
 
+        # If the machine is only moving in x, y, a, b
         gcode.string << "F#{$laserFeedrate}"
 
       end
 
     end
-
-    #gcode.string << "F#{(gcode.feedrate)}" # Removed tab
-    #gcode.string << "P#{(gcode.power)}"
 
     puts "#{gcode.string}" if $debugFinalGCode
 
@@ -142,6 +145,7 @@ module CalculateTrajectory
 
   def self.CheckGCode gcode
 
+    # Check the gcode is it is needed, moving and cutting with 0,0,0,0,0 are not useful
     if (gcode.gcode == 0 || gcode.gcode == 1) && gcode.x == 0 && gcode.y == 0 && gcode.z == 0 && gcode.a == 0 && gcode.b == 0
 
       return true
@@ -154,16 +158,26 @@ module CalculateTrajectory
 
   def self.GetCuts tempGCodeArray
 
+    # Collect all the calculated cuts from the cutting strategy cutting array
+
     $cuttingStrategy.each do |faceCuttingStrategy|
 
+      # Get start point
       point1 = faceCuttingStrategy.laserStartPosition
+
+      # Get end point
       point2 = faceCuttingStrategy.laserEndPosition
+
+      # Get start orientation
       orientation1 = faceCuttingStrategy.laserStartOrientation
+
+      # Get end orientation
       orientation2 = faceCuttingStrategy.laserEndOrientation
 
       # New GCode with point1, point2 and the cutting code.
       gcode = GCode.new(point1, point2, orientation1, orientation2, 1)
 
+      # Push to the array
       tempGCodeArray.push(gcode)
 
     end
@@ -179,10 +193,9 @@ module CalculateTrajectory
     ghost = GCode.new(ghost_point, ghost_point, ghost_orientation, ghost_orientation, 0)
 
     tempGCodeArray.insert(0,ghost)
-
     # If there's only one GCode cut instructions...
 
-    # Cut'n'Move
+    # --- The Great Cut'n'Move Algorithm ---
 
     # Test first point
     $gcodeArray.push(tempGCodeArray.first)
@@ -205,12 +218,16 @@ module CalculateTrajectory
           puts "Exit is closest." if $debugPathAlgorithm
 
           # Swap exit and entry point and orientation
+
+          # Save one point, orientation
           point_temp = next_gcode.point2
           orientation_temp = next_gcode.orientation2
 
+          # Swap points, orientation
           next_gcode.point2 = next_gcode.point1
           next_gcode.orientation2 = next_gcode.orientation1
 
+          # Insert saved points, orientation
           next_gcode.point1 = point_temp
           next_gcode.orientation1 = orientation_temp
 
@@ -257,127 +274,6 @@ module CalculateTrajectory
     finalGcode = GCode.new($gcodeArray.last.point2, ghost_point, $gcodeArray.last.orientation2, ghost_orientation,0)
 
     $gcodeArray.push(finalGcode)
-
-=begin
-    tempGCodeArray.each do |tempGCode|
-
-      $gcodeArray.push(tempGCode)
-
-    end
-=end
-
-=begin
-    $gcodeArray.push(tempGCodeArray.first)
-
-    limit = tempGCodeArray.size
-
-    x = 0
-
-    while x < limit
-
-      x += 1
-
-      tempGCodeArray.compact! # removes all NIL elements in array
-
-      for j in tempGCodeArray do
-
-        i = tempGCodeArray.first
-        distance1 = 0
-        distance2 = 0
-
-        if j == i
-
-        else
-
-          travel_point1 = nil
-          travel_point2 = nil
-
-          if i.start_point == 2
-
-              puts "starting point 2" if $debugCalculateTrajectory
-
-              travel_point1 = i.point1
-              orientation_point1 = i.orientation1
-
-              distance1 = i.point1.distance(j.point1)
-
-              Sketchup.active_model.entities.add_line(i.point1, j.point1) if $debugCalculateTrajectory
-
-              distance2 = i.point1.distance(j.point2)
-
-              Sketchup.active_model.entities.add_line(i.point1, j.point2) if $debugCalculateTrajectory
-
-          else
-
-              puts "starting point 1" if $debugCalculateTrajectory
-
-              travel_point1 = i.point2
-              orientation_point1 = i.orientation2
-
-              distance1 = i.point2.distance(j.point1)
-
-              Sketchup.active_model.entities.add_line(i.point2, j.point1) if $debugCalculateTrajectory
-
-              distance2 = i.point2.distance(j.point2)
-
-              Sketchup.active_model.entities.add_line(i.point2, j.point2) if $debugCalculateTrajectory
-
-          end
-
-          if distance1 <= distance2
-
-              j.start_point = 1
-              j.distance = distance1
-
-              puts "Does this happen???"  if $debugCalculateTrajectory
-              puts"distance1 ---->> #{distance1} < #{distance2}"  if $debugCalculateTrajectory
-
-          else
-
-              j.start_point = 2
-              j.distance = distance2
-
-              puts "Or this happen???"  if $debugCalculateTrajectory
-              puts"distance2 ---->> #{distance2} < #{distance1}"  if $debugCalculateTrajectory
-
-          end
-
-        end
-
-      end
-
-      puts " #{distance2} || #{distance1}" if $debugCalculateTrajectory
-
-      tempGCodeArray.shift                                               # Removed the tested index
-
-      tempGCodeArray.sort! { |xD,yD| xD.distance <=> yD.distance }             # Sort the array according to the distance meassured
-
-      puts "Size: #{tempGCodeArray.size}" if $debugCalculateTrajectory
-
-      if tempGCodeArray.size != 0
-
-        if tempGCodeArray.first.start_point == 1
-          travel_point2 = tempGCodeArray.first.point1
-          orientation_point2 = tempGCodeArray.first.orientation1
-
-        else
-          travel_point2 = tempGCodeArray.first.point2
-          orientation_point2 = tempGCodeArray.first.orientation2
-
-        end
-
-      end
-
-      movenode = GCode.new(travel_point1, travel_point2, orientation_point1, orientation_point2, 0)
-
-      $gcodeArray.push(movenode)
-
-      # Pushes the arranged lines to distance sorted array
-      $gcodeArray.push(tempGCodeArray.first) if tempGCodeArray.size != 0
-
-    end
-
-=end
 
   end
 

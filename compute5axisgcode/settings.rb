@@ -9,7 +9,7 @@ $laserFocalPercent = 100 # % (0 = top, 100 = bottom of face)
 
 # --- MACHINE LIMITATIONS ---
 
-$laserFeedrate = 800
+$laserFeedrate = 8000
 $laserCuttingFeedrate = 150
 $laserZFeedrateLimit = 400
 
@@ -47,7 +47,7 @@ $switchAxisXY = false
 # --- SKETCHUP DRAWING
 
 $drawRaytest = false
-$drawLaserCut = true
+$drawLaserCut = false
 
 
 # --- DEBUGGING ---
@@ -60,10 +60,17 @@ $debugAnalyseModel = false
 
 # Analyse Faces
 $debugAnalyseFaces = false
+$debugTopBottom = false
 
 # Calculate Cutting Strategy
-$debugClearCutRayArray = true
+$debugFaceCuttingStrategy = false
+$debugClearCutRayArray = false
+$debugTopBottomVertices = false
+$debugOuterVertices = false
+$debugGenerateCuttingLine = false
+$debugScaleVector = false
 $debugRaytest = false
+$debug2DInsidePolygon = false
 $debugCalculateCuttingStrategy = false
 $debugStrategy1 = false
 $debugStrategy2 = false
@@ -72,6 +79,8 @@ $debugStrategy3 = false
 $debugStrategy3rays = false
 $debugLaserCut = false
 $debugCalculateABangle = false
+$debugProjectVector = false
+$debugUpVector = false
 
 # Calculate Path
 $debugGCode = false

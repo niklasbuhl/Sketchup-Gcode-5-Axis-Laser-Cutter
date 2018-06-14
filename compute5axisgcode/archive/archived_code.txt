@@ -79,6 +79,7 @@
 
   # ---
 
+
   # User Interface Toolbar
 
   # ---
@@ -120,4 +121,164 @@
   toolbar.each { | item |
     puts item
   }
+=end
+
+
+
+  def self.GenerateSimpleTestModel
+
+    puts "Generate Simple Test Model. v0.1"
+
+    model = Sketchup.active_model
+
+    testModelPath = File.join(File.dirname(__FILE__),'/compute5axisgcode/testmodels/test-simplemodel.skp')
+
+    model.import(testModelPath)
+
+  end
+
+
+# Too add to Sketchup on Niklas
+  UI.menu.add_item("0. G-Code") { load("/Users/nbxyz/Develop/Sketchup-Gcode-5-Axis-Laser-Cutter/compute5axisgcode.rb");}
+# Too add to Sketchup on Jesper
+UI.menu.add_item("0. G-Code") { load("C:\\Projects\\Sketchup-Gcode-5-Axis-Laser-Cutter\\compute5axisgcode/.rb");}
+
+
+
+
+=begin
+      if !xyHit || !yzHit || !xzHit
+
+        puts "Object hit is outside the face!" if $debugRaytest
+
+        # Unhide all hidden faces
+        hiddenArray.each { |hiddenEntity| hiddenEntity.hidden = false }
+
+        #puts "Ray test complete!" if $debugRaytest
+
+        return true
+
+      end
+
+=end
+
+=begin
+    tempGCodeArray.each do |tempGCode|
+
+      $gcodeArray.push(tempGCode)
+
+    end
+=end
+
+=begin
+    $gcodeArray.push(tempGCodeArray.first)
+
+    limit = tempGCodeArray.size
+
+    x = 0
+
+    while x < limit
+
+      x += 1
+
+      tempGCodeArray.compact! # removes all NIL elements in array
+
+      for j in tempGCodeArray do
+
+        i = tempGCodeArray.first
+        distance1 = 0
+        distance2 = 0
+
+        if j == i
+
+        else
+
+          travel_point1 = nil
+          travel_point2 = nil
+
+          if i.start_point == 2
+
+              puts "starting point 2" if $debugCalculateTrajectory
+
+              travel_point1 = i.point1
+              orientation_point1 = i.orientation1
+
+              distance1 = i.point1.distance(j.point1)
+
+              Sketchup.active_model.entities.add_line(i.point1, j.point1) if $debugCalculateTrajectory
+
+              distance2 = i.point1.distance(j.point2)
+
+              Sketchup.active_model.entities.add_line(i.point1, j.point2) if $debugCalculateTrajectory
+
+          else
+
+              puts "starting point 1" if $debugCalculateTrajectory
+
+              travel_point1 = i.point2
+              orientation_point1 = i.orientation2
+
+              distance1 = i.point2.distance(j.point1)
+
+              Sketchup.active_model.entities.add_line(i.point2, j.point1) if $debugCalculateTrajectory
+
+              distance2 = i.point2.distance(j.point2)
+
+              Sketchup.active_model.entities.add_line(i.point2, j.point2) if $debugCalculateTrajectory
+
+          end
+
+          if distance1 <= distance2
+
+              j.start_point = 1
+              j.distance = distance1
+
+              puts "Does this happen???"  if $debugCalculateTrajectory
+              puts"distance1 ---->> #{distance1} < #{distance2}"  if $debugCalculateTrajectory
+
+          else
+
+              j.start_point = 2
+              j.distance = distance2
+
+              puts "Or this happen???"  if $debugCalculateTrajectory
+              puts"distance2 ---->> #{distance2} < #{distance1}"  if $debugCalculateTrajectory
+
+          end
+
+        end
+
+      end
+
+      puts " #{distance2} || #{distance1}" if $debugCalculateTrajectory
+
+      tempGCodeArray.shift                                               # Removed the tested index
+
+      tempGCodeArray.sort! { |xD,yD| xD.distance <=> yD.distance }             # Sort the array according to the distance meassured
+
+      puts "Size: #{tempGCodeArray.size}" if $debugCalculateTrajectory
+
+      if tempGCodeArray.size != 0
+
+        if tempGCodeArray.first.start_point == 1
+          travel_point2 = tempGCodeArray.first.point1
+          orientation_point2 = tempGCodeArray.first.orientation1
+
+        else
+          travel_point2 = tempGCodeArray.first.point2
+          orientation_point2 = tempGCodeArray.first.orientation2
+
+        end
+
+      end
+
+      movenode = GCode.new(travel_point1, travel_point2, orientation_point1, orientation_point2, 0)
+
+      $gcodeArray.push(movenode)
+
+      # Pushes the arranged lines to distance sorted array
+      $gcodeArray.push(tempGCodeArray.first) if tempGCodeArray.size != 0
+
+    end
+
 =end

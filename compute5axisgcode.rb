@@ -434,7 +434,7 @@ module Main
 
     model = Sketchup.active_model
 
-    testModelPath = File.join(File.dirname(__FILE__),'/compute5axisgcode/testmodels//test-geometrier-laser.skp')
+    testModelPath = File.join(File.dirname(__FILE__),'/compute5axisgcode/test-geometrier-laser.skp')
 
     model.import(testModelPath)
 

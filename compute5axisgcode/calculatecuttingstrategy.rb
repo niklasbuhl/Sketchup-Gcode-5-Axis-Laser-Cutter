@@ -413,8 +413,6 @@ module CalculateCuttingStrategy
 
   end
 
-
-
   def self.ThirdStrategy faceCuttingStrategy, cutting_index
 
     # As they are already saved from above (Second Strategy) they should just be checked.
@@ -478,8 +476,6 @@ module CalculateCuttingStrategy
     return vector
 
   end
-
-
 
   def self.ScaleVector vector, scalar
 

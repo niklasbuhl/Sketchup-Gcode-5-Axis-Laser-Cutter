@@ -4,7 +4,7 @@
 
 # --- LASER ---
 
-$laserFocalPoint = 167.mm # away from head
+$laserFocalPoint = 50.8.mm # away from head
 $laserFocalPercent = 100 # % (0 = top, 100 = bottom of face)
 
 # --- MACHINE LIMITATIONS ---
@@ -27,7 +27,7 @@ $tableDepth = 400.mm #(y-axis)
 $tableHeight = 200.mm #(z-axis)
 $laserStartX = 0.mm
 $laserStartY = 0.mm
-$laserStartZ = 167.mm
+$laserStartZ = 200.mm
 
 # --- INVERTING AXES ---
 
@@ -47,7 +47,7 @@ $switchAxisXY = false
 # --- SKETCHUP DRAWING
 
 $drawRaytest = false
-$drawLaserCut = false
+$drawLaserCut = true
 
 
 # --- DEBUGGING ---

@@ -109,6 +109,8 @@ module CalculateTrajectory
 
     # G0  [tab] X0.0000 [tab] Y0.0000 [tab] Z0.0000 [tab] A0.0000 [tab] B0.0000 [tab] F0.0000
 
+    # GCode convention for the Smoothieboard
+
     gcode.string = "G#{gcode.gcode}\t"
 
     gcode.string << "X#{(gcode.x)}\t"
